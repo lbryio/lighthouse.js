@@ -10,7 +10,31 @@
 >3. Lighthouse API server, which serves the API and does all calculations about what to send to the end user. 
 
 ## DEVELOPMENT NOTES:
-> Stuff needed to be worked on(in order):
->1. Importer needs to add the block that the claim was made in as depth wont work in a a plain-non-updating-all-claims database.
->2. Lighthouse API server needs to be rebuilt in node.js with Koa.JS, this api server will query the elasticsearch autosuggest api, this will need some score balance between searching names,titles and description and some logic to only send the standing claims to the clients.(Bill can help with this part as this will take the longest)
->3. Ansible configuration and documentation 
+> Stuff needed to be worked on are located in issues or in the project board.
+
+
+## Running
+Install dependencies
+```
+yarn install --production=false
+```
+
+Start a Local Server
+```
+npm start
+```
+
+Run Test
+```
+npm test
+```
+
+Building and Running Production Server
+```
+npm run prod
+```
+
+**Note : Please make sure your elasticsearch server is running before using ```npm start``` or ```npm run prod```**
+
+## License
+MIT &copy; [LBRYio, Filip Nyquist, Bill Bittner](https://github.com/lbryio)

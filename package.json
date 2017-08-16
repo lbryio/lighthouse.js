@@ -1,0 +1,65 @@
+{
+  "name": "lighthouse",
+  "description": "Lighthouse is a lightning-fast advanced search engine API for publications on the lbrycrd with autocomplete capabilities.",
+  "version": "0.0.1",
+  "author": "filipnyquist <filip@lbry.io> , billbitt <bill@lbry.io>",
+  "keywords": [
+    "lbry",
+    "search",
+    "koa",
+    "rest",
+    "api",
+    "async",
+    "es7"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lbryio/lighthouse.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lbryio/lighthouse/issues"
+  },
+  "homepage": "https://github.com/lbryio/lighthouse#readme",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "nodemon server/ --exec babel-node",
+    "build": "babel server -d dist",
+    "lint": "eslint ./server",
+    "test": "npm run lint && npm run mocha",
+    "prod": "npm run build && node dist/",
+    "mocha": "./node_modules/.bin/mocha --compilers js:babel-register --require babel-polyfill"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.5.0",
+    "glob": "^7.1.1",
+    "jsonwebtoken": "^7.2.1",
+    "koa": "^2.0.0-alpha.7",
+    "koa-bodyparser": "^3.0.0",
+    "koa-helmet": "^2.0.0",
+    "koa-jwt": "^2.1.0",
+    "koa-logger": "^2.0.0",
+    "koa-router": "^7.0.0",
+    "mongoose": "^4.4.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.5.1",
+    "babel-eslint": "^7.1.1",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-syntax-async-functions": "^6.5.0",
+    "babel-plugin-transform-async-to-generator": "^6.5.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.3.13",
+    "chai": "^3.5.0",
+    "eslint": "^3.12.2",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "mocha": "^3.2.0",
+    "nodemon": "^1.8.1",
+    "should": "^11.1.2",
+    "supertest": "^2.0.1"
+  }
+}
