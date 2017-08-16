@@ -1,0 +1,42 @@
+{
+  "env": {
+    "browser": false,
+    "mocha": false,
+    "es6": true,
+    "node": true
+  },
+  "parser": "babel-eslint",
+  "extends": "standard",
+  "globals": {
+    "GENTLY": true
+  },
+  "rules": {
+    "no-multi-spaces": 0,
+    "new-cap": 0,
+    "prefer-promise-reject-errors":0,
+    "comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
+    "semi": [
+      "error",
+      "always", 
+      { "omitLastInOneLineBlock": true }
+      ],
+    "key-spacing": [
+      "error",
+      {
+        "multiLine": {
+          "beforeColon": false,
+          "afterColon": true
+        },
+        "align": {
+          "beforeColon": false,
+          "afterColon": true,
+          "on": "colon",
+          "mode": "strict"
+        }
+      }
+    ]
+  }
+}
