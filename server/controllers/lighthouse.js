@@ -1,8 +1,16 @@
 import 'babel-polyfill';
-
+import { sync, getStats } from '../utils/importer';
+// import elasticSearch from 'elasticsearch';
+/* const eclient = new elasticSearch.Client({
+   host: 'http://elastic:changeme@localhost:9200',
+   log : 'info',
+   }); */
 class LighthouseControllers {
   /* eslint-disable no-param-reassign */
-
+  // Start syncing blocks...
+  startSync () {
+    sync(200000);
+  }
   /**
    * Search api here
    * @param {ctx} Koa Context
@@ -24,7 +32,7 @@ class LighthouseControllers {
    * @param {ctx} Koa Context
    */
   async status (ctx) {
-    ctx.body = 'Status...';
+    ctx.body = getStats();
   }
 
   /* eslint-enable no-param-reassign */

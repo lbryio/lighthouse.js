@@ -1,5 +1,8 @@
+/*
+ *  Importer code, handles all the syncing with the blockchain into elasticsearch.
+ */
 const bitcoin = require('bitcoin-promise');
-var elasticsearch = require('elasticsearch');
+const elasticsearch = require('elasticsearch');
 var eclient = new elasticsearch.Client({
   host: 'http://elastic:changeme@localhost:9200',
   log : 'info',
@@ -11,24 +14,32 @@ const client = new bitcoin.Client({
   pass   : 'lbry',
   timeout: 30000,
 });
+let claimsSynced = 0;
+let status = {};
 
-async function sync (currentHeight) {
+export async function sync (currentHeight) {
   try {
-    let maxHeight = await client.getBlockCount().then(blockHash => { return blockHash }).catch(err => console.log(err));
+    let maxHeight = await client.getBlockCount().then(blockHash => { return blockHash }).catch(err => { throw err });
     if (currentHeight <= maxHeight) {
       let claims = await require('./getClaims')(currentHeight, client);
       send(claims);
-      this.claimsSynced += claims.length;
+      claimsSynced += claims.length;
       // currentHeight / maxHeight / claimsSynced
+      status.message = `Running,${currentHeight} / ${maxHeight} done, ${claimsSynced} claims imported.`;
       sync(currentHeight + 1);
     } else {
-      process.exit(0);
-      // Waiting for new blocks logic here
+      await sleep(2000);
+      status.message = `All claims imported, waiting for new blocks at ${maxHeight}`;
       sync(currentHeight); // eslint-disable-line no-unreachable
     }
   } catch (err) {
-    // Catch errors here
+    console.log(err);
+    status.err = err;
   }
+}
+
+export function getStats () {
+  return status;
 }
 
 function send (arr) { // Modular change output here :)
@@ -37,7 +48,6 @@ function send (arr) { // Modular change output here :)
     // Check if our value is a object, else make it a object...
     claim['value'] = (typeof claim.value === 'object' ? claim.value : JSON.parse(claim.value));
     // claim['value'] = JSON.stringify(claim['value']);
-    console.log(claim.value.metadata);
     if (claim.name && claim.value) {
       claim.suggest_name = {
         input : claim.name,
@@ -56,10 +66,11 @@ function send (arr) { // Modular change output here :)
       id   : claim.claimId,
       body : claim,
     }, function (error, response) {
-      if (error) { console.log(error) }
-      console.log(response);
+      if (error) { status.err = error }
     });
   });
 }
 
-module.exports = exports = sync;
+function sleep (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
