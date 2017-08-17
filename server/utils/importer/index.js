@@ -51,7 +51,7 @@ function send (arr) { // Modular change output here :)
     if (claim.name && claim.value) {
       claim.suggest_name = {
         input : claim.name,
-        weight: 20,
+        weight: 30,
       };
       if (claim.value.claimType === 'streamType' && claim.value.stream.metadata && claim.value.stream.metadata.description) {
         claim.suggest_desc = {
@@ -66,7 +66,7 @@ function send (arr) { // Modular change output here :)
       id   : claim.claimId,
       body : claim,
     }, function (error, response) {
-      if (error) { status.err = error }
+      if (error) { status.err = error; console.log(error) }
     });
   });
 }

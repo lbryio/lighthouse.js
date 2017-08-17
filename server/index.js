@@ -4,6 +4,11 @@ import logger from 'koa-logger';
 import helmet from 'koa-helmet';
 import routing from './routes/';
 import { port } from './config';
+import winston from 'winston';
+
+// Setup logging
+winston.remove(winston.transports.Console);
+winston.add(winston.transports.Console, {colorize: true});
 
 // Create Koa Application
 const app = new Koa();
@@ -16,6 +21,6 @@ app
 routing(app);
 
 // Start the application
-app.listen(port, () => console.log(`✅  The server is running at http://localhost:${port}/`));
+app.listen(port, () => winston.log('info', `Lighthouse API server is running at http://localhost:${port}/`));
 
 export default app;
