@@ -1,10 +1,18 @@
 import 'babel-polyfill';
 import winston from 'winston';
+import winstonStream from 'winston-stream';
 import { sync, getStats } from '../utils/importer';
 import elasticsearch from 'elasticsearch';
+
+const loggerStream = winstonStream(winston, 'info');
+
 const eclient = new elasticsearch.Client({
   host: 'http://elastic:changeme@localhost:9200',
-  log : 'info',
+  log : {
+    level : 'info',
+    type  : 'stream',
+    stream: loggerStream,
+  },
 });
 
 function getSuggestions (input) {

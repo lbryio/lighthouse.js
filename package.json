@@ -49,7 +49,8 @@
     "ora": "^1.3.0",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
-    "winston": "^2.3.1"
+    "winston": "^2.3.1",
+    "winston-stream": "^0.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.5.1",
