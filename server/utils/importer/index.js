@@ -3,10 +3,20 @@
  */
 const bitcoin = require('bitcoin-promise');
 const elasticsearch = require('elasticsearch');
-var eclient = new elasticsearch.Client({
+const winston = require('winston');
+const winstonStream = require('winston-stream');
+
+const loggerStream = winstonStream(winston, 'info');
+
+const eclient = new elasticsearch.Client({
   host: 'http://elastic:changeme@localhost:9200',
-  log : 'info',
+  log : {
+    level : 'info',
+    type  : 'stream',
+    stream: loggerStream,
+  },
 });
+
 const client = new bitcoin.Client({
   host   : 'localhost',
   port   : 9245,

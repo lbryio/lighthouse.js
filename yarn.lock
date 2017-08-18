@@ -3546,6 +3546,10 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2"
 
+winston-stream@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/winston-stream/-/winston-stream-0.0.0.tgz#9cd21c9828f688f184768e3fd53254140dca663c"
+
 winston@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/winston/-/winston-2.3.1.tgz#0b48420d978c01804cf0230b648861598225a119"

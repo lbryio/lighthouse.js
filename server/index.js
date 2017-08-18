@@ -8,7 +8,7 @@ import winston from 'winston';
 
 // Setup logging
 winston.remove(winston.transports.Console);
-winston.add(winston.transports.Console, {colorize: true});
+winston.add(winston.transports.Console, { colorize: true, timestamp: true, prettyPrint: true });
 
 // Create Koa Application
 const app = new Koa();
