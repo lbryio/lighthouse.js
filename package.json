@@ -23,7 +23,7 @@
   "homepage": "https://github.com/lbryio/lighthouse#readme",
   "main": "server/index.js",
   "scripts": {
-    "start": "nodemon server/ --exec babel-node",
+    "start": "nodemon server/ --exec babel-node --ignore 'claimTrieCache.json'",
     "build": "babel server -d dist",
     "lint": "eslint ./server",
     "test": "npm run lint && npm run mocha",
@@ -31,10 +31,12 @@
     "mocha": "./node_modules/.bin/mocha --compilers js:babel-register --require babel-polyfill"
   },
   "dependencies": {
+    "app-root-path": "^2.0.1",
     "babel-polyfill": "^6.5.0",
-    "bitcoin-promise": "filipnyquist/node-bitcoin-promise#c3eb4bea552a7a136a4a1405d831da3e92f2efea",
+    "bitcoin-promise": "filipnyquist/node-bitcoin-promise#1fbf1cb8913ca3542b66060d48ebea185661e0a7",
     "bluebird": "^3.5.0",
     "chalk": "^2.0.1",
+    "elastic-queue": "^0.3.0",
     "elasticsearch": "^13.2.0",
     "glob": "^7.1.1",
     "jsonfile": "^3.0.1",

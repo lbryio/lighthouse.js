@@ -34,7 +34,7 @@ class LighthouseControllers {
   // Start syncing blocks...
   startSync () {
     winston.log('info', '[Importer] Started importer, indexing claims.');
-    sync(200000);
+    sync();
   }
   /**
    * Search api here
