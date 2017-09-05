@@ -1,0 +1,19 @@
+- name: Lighthouse - Download lbrycrd
+  hosts: lighthouse
+  tasks:
+  - raw: apt-get update && apt-get install -y wget unzip screen
+  - raw: cd ~ && wget https://github.com/lbryio/lbrycrd/releases/download/v0.12.0.5/lbrycrd-linux.zip && unzip lbrycrd-linux.zip -d lbrycrd
+  - raw: cd ~/lbrycrd && screen -S lbrycrd -d -m ./lbrycrdd -server -txindex -reindex -rpcuser=lbry -rpcpassword=lbry && sleep 2
+
+- name: Lighthouse - Install elasticsearch, download and install lighthouse
+  hosts: lighthouse
+  roles:
+    - { role: elasticsearch, es_instance_name: "node1", es_heap_size: "256m" }
+    - { role: geerlingguy.nodejs, nodejs_version: "8.x" }
+    - { role: yarn }
+    - { role: bobbyrenwick.pip }  
+  tasks:
+  - git: repo=https://github.com/lbryio/lighthouse.git dest=~/lighthouse
+  - raw: cd ~/lighthouse/decoder && pip install -r requirements.txt && screen -S decoder -d -m python decoder.py && sleep 2
+  - raw: cd ~/lighthouse && yarn install --production=false && yarn global add forever
+  - raw: forever start -c "npm run prod" ~/lighthouse

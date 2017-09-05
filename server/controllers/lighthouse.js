@@ -7,7 +7,7 @@ import elasticsearch from 'elasticsearch';
 const loggerStream = winstonStream(winston, 'info');
 
 const eclient = new elasticsearch.Client({
-  host: 'http://elastic:changeme@localhost:9200',
+  host: 'http://localhost:9200',
   log : {
     level : 'info',
     type  : 'stream',

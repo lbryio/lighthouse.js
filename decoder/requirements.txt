@@ -1,0 +1,3 @@
+git+https://github.com/lbryio/lbryschema.git#egg=lbryschema
+python-bitcoinrpc==0.1
+flask
