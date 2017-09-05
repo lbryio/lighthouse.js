@@ -16,4 +16,4 @@
   - git: repo=https://github.com/lbryio/lighthouse.git dest=~/lighthouse
   - raw: cd ~/lighthouse/decoder && pip install -r requirements.txt && screen -S decoder -d -m python decoder.py && sleep 2
   - raw: cd ~/lighthouse && yarn install --production=false && yarn global add forever
-  - raw: forever start -c "npm run prod" ~/lighthouse
+  - raw: cd ~/lighthouse && yarn run build && cd dist && forever start index.js
