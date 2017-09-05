@@ -1,0 +1,2 @@
+#!/bin/bash
+curl -X PUT http://localhost:9200/claims -d '{ "settings" : { "number_of_shards" : 1 }, "mappings" : { "claim" : { "properties" : { "value" : { "type" : "nested" }, "suggest_name": { "type": "completion" }, "suggest_desc": { "type": "completion" } } } } }'
