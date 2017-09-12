@@ -42,7 +42,12 @@ class LighthouseControllers {
    */
   async search (ctx) {
     await getSuggestions(ctx.query.s).then(function (result) {
-      ctx.body = result;
+      let results = result.claim[0].options;
+      let cResults = [];
+      for (let pResult of results) {
+        cResults.push(pResult._source);
+      }
+      ctx.body = cResults;
     });
     // ctx.body = 'Search...';
   }
