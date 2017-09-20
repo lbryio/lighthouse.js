@@ -94,9 +94,21 @@ class LighthouseControllers {
       let results = result.hits.hits;
       let cResults = [];
       for (let pResult of results) {
-        cResults.push(pResult._source);
+        cResults.push(pResult._source.name);
+        if(pResult._source.value !== undefined){
+          cResults.push(pResult._source.value.stream.metadata.title);
+          cResults.push(pResult._source.value.stream.metadata.author);          
+        }
       }
-      ctx.body = cResults;
+
+      var clean = new Array();
+      for (var i = 0; i < cResults.length; i++) {
+        if (cResults[i] && cResults[i].length > 3 && clean.indexOf(cResults[i]) == -1) {
+          clean.push(cResults[i]);
+        }
+      }
+
+      ctx.body = clean;
     });
   }
   /**
