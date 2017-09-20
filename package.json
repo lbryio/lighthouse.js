@@ -28,7 +28,8 @@
     "lint": "eslint ./server",
     "test": "npm run lint && npm run mocha",
     "prod": "npm run build && node dist/",
-    "mocha": "./node_modules/.bin/mocha --compilers js:babel-register --require babel-polyfill"
+    "mocha": "./node_modules/.bin/mocha --compilers js:babel-register --require babel-polyfill",
+    "gendoc": "apidoc -i server/ -o doc/"
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
@@ -55,6 +56,7 @@
     "winston-stream": "^0.0.0"
   },
   "devDependencies": {
+    "apidoc": "^0.17.6",
     "babel-cli": "^6.5.1",
     "babel-eslint": "^7.1.1",
     "babel-plugin-add-module-exports": "^0.2.1",

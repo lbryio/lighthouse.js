@@ -15,7 +15,7 @@ const loggerStream = winstonStream(winston, 'info');
 const eclient = new elasticsearch.Client({
   host: 'http://localhost:9200',
 
-  log : {
+  log: {
     level : 'info',
     type  : 'stream',
     stream: loggerStream,
