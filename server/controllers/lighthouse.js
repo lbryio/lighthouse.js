@@ -17,6 +17,8 @@ const eclient = new elasticsearch.Client({
 });
 
 function getResults(input) {
+  if(input.size == undefined) input.size = 10;
+  if(input.from == undefined) input.from = 0;
   return eclient.search({
     index: "claims",
     body: {
@@ -24,7 +26,7 @@ function getResults(input) {
         "bool": {
           "must": {
             "query_string": {
-              "query": input.trim(),
+              "query": input.s.trim(),
               "fields": [
                 "name",
                 "value.stream.metadata.author",
@@ -34,12 +36,16 @@ function getResults(input) {
             }
           }
         }
-      }
+      },
+      size: input.size,
+      from: input.from
     }
   });
 }
 
 function getAutoComplete(input) {
+  if(input.size == undefined) input.size = 10;
+  if(input.from == undefined) input.from = 0;
   return eclient.search({
     index: "claims",
     _source: ["name", "value.stream.metadata.title", "value.stream.metadata.author"],
@@ -48,7 +54,7 @@ function getAutoComplete(input) {
         "bool": {
           "must": {
             "query_string": {
-              "query": input.trim(),
+              "query": input.s.trim(),
               "fields": [
                 "name",
                 "value.stream.metadata.title",
@@ -57,7 +63,9 @@ function getAutoComplete(input) {
             }
           }
         }
-      }
+      },
+      size: input.size,
+      from: input.from
     }
   });
 }
@@ -74,7 +82,7 @@ class LighthouseControllers {
    * @param {ctx} Koa Context
    */
   async search(ctx) {
-    await getResults(ctx.query.s).then(function (result) {
+    await getResults(ctx.query).then(function (result) {
       let results = result.hits.hits;
       let cResults = [];
       for (let pResult of results) {
@@ -90,7 +98,7 @@ class LighthouseControllers {
  * @param {ctx} Koa Context
  */
   async autoComplete(ctx) {
-    await getAutoComplete(ctx.query.s).then(function (result) {
+    await getAutoComplete(ctx.query).then(function (result) {
       let results = result.hits.hits;
       let cResults = [];
       for (let pResult of results) {
@@ -116,7 +124,7 @@ class LighthouseControllers {
    * @param {ctx} Koa Context
    */
   async info(ctx) {
-    ctx.body = 'Info...';
+    ctx.body = "Lighthouse";
   }
 
   /**
@@ -124,7 +132,7 @@ class LighthouseControllers {
    * @param {ctx} Koa Context
    */
   async status(ctx) {
-    ctx.body = getStats();
+    ctx.body =  eclient.getStats();
   }
 
   /* eslint-enable no-param-reassign */
