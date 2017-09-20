@@ -21,12 +21,13 @@ function getResults(input) {
   if(input.from == undefined) input.from = 0;
   return eclient.search({
     index: "claims",
+    _source: ["name", "value", "claimId"],
     body: {
       "query": {
         "bool": {
           "must": {
             "query_string": {
-              "query": input.s.trim(),
+              "query": '*' + input.s.trim() + '*',
               "fields": [
                 "name",
                 "value.stream.metadata.author",
@@ -54,7 +55,7 @@ function getAutoComplete(input) {
         "bool": {
           "must": {
             "query_string": {
-              "query": input.s.trim(),
+              "query": "*" + input.s.trim() + "*",
               "fields": [
                 "name",
                 "value.stream.metadata.title",
