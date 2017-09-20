@@ -15,15 +15,13 @@ router.prefix(`/${baseApi}/${api}`);
 router.get('/', LighthouseControllers.info);
 
 /**
- * @api {post} /search Main Search API
+ * @api {get} /search Main Search API
  * @apiGroup Search
- * @apiParam {String} input The search text (Required)
+ * @apiParam {String} s The search text (Required)
  * @apiParam {Integer} size Amount of results to return as max
  * @apiParam {Integer} from The number to start from, good for pagination.
- * @apiParamExample {json} Input
- *    {
- *      "input": "fillerino", "size": 10, "from": 2
- *    }
+ * @apiParamExample {url} Example
+ *    http://localhost/api/lighthouse/search?s=fillerino
  * @apiSuccess {Array[]}  array List of search response, each containing the value below.
  * @apiSuccess {Object[]}  result A search result
  * @apiSuccess {String}   result.name The name of the claim.
@@ -68,13 +66,11 @@ router.get('/', LighthouseControllers.info);
 router.get('/search', LighthouseControllers.search);
 
 /**
- * @api {post} /autocomplete Autocomplete API
+ * @api {get} /autocomplete Autocomplete API
  * @apiGroup Search
- * @apiParam {String} input The text to be autocompleted (Required).
- * @apiParamExample {json} Input
- *    {
- *      "input": "fillerino"
- *    }
+ * @apiParam {String} s The text to be autocompleted (Required).
+ * @apiParamExample {url} Example
+ *    http://localhost/api/lighthouse/autocomplete?s=fillerino
  * @apiSuccess {Array[]}  array List of search response, each containing the value below.
  * @apiSuccessExample {json} Success
  *    HTTP/1.1 200 OK
