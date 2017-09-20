@@ -20,22 +20,23 @@ function getResults (input) {
   if (input.size === undefined) input.size = 10;
   if (input.from === undefined) input.from = 0;
   return eclient.search({
-    index: 'claims',
-    body : {
-      'query': {
-        'bool': {
-          'must': {
-            'query_string': {
-              'query' : input.s.trim(),
-              'fields': [
-                'name',
-                'value.stream.metadata.author',
-                'value.stream.metadata.title',
-                'value.stream.metadata.description',
-              ],
-            },
-          },
-        },
+    index: "claims",
+    _source: ["name", "value", "claimId"],
+    body: {
+      "query": {
+        "bool": {
+          "must": {
+            "query_string": {
+              "query": '*' + input.s.trim() + '*',
+              "fields": [
+                "name",
+                "value.stream.metadata.author",
+                "value.stream.metadata.title",
+                "value.stream.metadata.description"
+              ]
+            }
+          }
+        }
       },
       size: input.size,
       from: input.from,
@@ -47,22 +48,22 @@ function getAutoComplete (input) {
   if (input.size === undefined) input.size = 10;
   if (input.from === undefined) input.from = 0;
   return eclient.search({
-    index  : 'claims',
-    _source: ['name', 'value.stream.metadata.title', 'value.stream.metadata.author'],
-    body   : {
-      'query': {
-        'bool': {
-          'must': {
-            'query_string': {
-              'query' : input.s.trim(),
-              'fields': [
-                'name',
-                'value.stream.metadata.title',
-                'value.stream.metadata.author',
-              ],
-            },
-          },
-        },
+    index: "claims",
+    _source: ["name", "value.stream.metadata.title", "value.stream.metadata.author"],
+    body: {
+      "query": {
+        "bool": {
+          "must": {
+            "query_string": {
+              "query": "*" + input.s.trim() + "*",
+              "fields": [
+                "name",
+                "value.stream.metadata.title",
+                "value.stream.metadata.author"
+              ]
+            }
+          }
+        }
       },
       size: input.size,
       from: input.from,
