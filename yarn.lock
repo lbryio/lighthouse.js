@@ -714,7 +714,7 @@ bitcoin-promise@filipnyquist/node-bitcoin-promise#1fbf1cb8913ca3542b66060d48ebea
   dependencies:
     bitcoin filipnyquist/node-bitcoin
 
-bitcoin@filipnyquist/node-bitcoin#17552efad852a0ae929dc153988649259536a23d:
+bitcoin@filipnyquist/node-bitcoin:
   version "3.0.2"
   resolved "https://codeload.github.com/filipnyquist/node-bitcoin/tar.gz/17552efad852a0ae929dc153988649259536a23d"
 
