@@ -75,7 +75,6 @@ class LighthouseControllers {
    */
   async search(ctx) {
     await getResults(ctx.query.s).then(function (result) {
-      console.log(result.hits.hits);
       let results = result.hits.hits;
       let cResults = [];
       for (let pResult of results) {
@@ -92,7 +91,6 @@ class LighthouseControllers {
  */
   async autoComplete(ctx) {
     await getAutoComplete(ctx.query.s).then(function (result) {
-      console.log(result.hits.hits);
       let results = result.hits.hits;
       let cResults = [];
       for (let pResult of results) {
