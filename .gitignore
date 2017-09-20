@@ -1,6 +1,7 @@
 node_modules
 .DS_Store
 /dist
+/doc
 npm-debug.log
 *.retry
 .vscode
