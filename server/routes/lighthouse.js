@@ -17,6 +17,10 @@ router.get('/', LighthouseControllers.info);
 // GET /api/search
 router.get('/search', LighthouseControllers.search);
 
+
+// GET /api/search
+router.get('/autocomplete', LighthouseControllers.autoComplete);
+
 // GET /api/ligthouse/status
 router.get('/status', LighthouseControllers.status);
 

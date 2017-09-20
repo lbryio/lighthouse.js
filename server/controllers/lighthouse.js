@@ -8,55 +8,104 @@ const loggerStream = winstonStream(winston, 'info');
 
 const eclient = new elasticsearch.Client({
   host: 'http://localhost:9200',
-  log : {
-    level : 'info',
-    type  : 'stream',
+
+  log: {
+    level: 'info',
+    type: 'stream',
     stream: loggerStream,
   },
 });
 
-function getSuggestions (input) {
-  return eclient.suggest({
-    index: 'claims',
-    body : {
-      'claim': {
-        'text'      : input,
-        'completion': {
-          'field': 'suggest_name',
-        },
-      },
-    },
+function getResults(input) {
+  return eclient.search({
+    index: "claims",
+    body: {
+      "query": {
+        "bool": {
+          "must": {
+            "query_string": {
+              "query": input.trim(),
+              "fields": [
+                "name",
+                "value.stream.metadata.author",
+                "value.stream.metadata.title",
+                "value.stream.metadata.description"
+              ]
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function getAutoComplete(input) {
+  return eclient.search({
+    index: "claims",
+    _source: ["name", "value.stream.metadata.title", "value.stream.metadata.author"],
+    body: {
+      "query": {
+        "bool": {
+          "must": {
+            "query_string": {
+              "query": input.trim(),
+              "fields": [
+                "name",
+                "value.stream.metadata.title",
+                "value.stream.metadata.author"
+              ]
+            }
+          }
+        }
+      }
+    }
   });
 }
 
 class LighthouseControllers {
   /* eslint-disable no-param-reassign */
   // Start syncing blocks...
-  startSync () {
+  startSync() {
     winston.log('info', '[Importer] Started importer, indexing claims.');
     sync();
   }
   /**
-   * Search api here
+   * Search API Endpoint.
    * @param {ctx} Koa Context
    */
-  async search (ctx) {
-    await getSuggestions(ctx.query.s).then(function (result) {
-      let results = result.claim[0].options;
+  async search(ctx) {
+    await getResults(ctx.query.s).then(function (result) {
+      console.log(result.hits.hits);
+      let results = result.hits.hits;
       let cResults = [];
       for (let pResult of results) {
         cResults.push(pResult._source);
       }
       ctx.body = cResults;
     });
-    // ctx.body = 'Search...';
   }
 
+
+ /**
+ * Autocomplete API Endpoint.
+ * @param {ctx} Koa Context
+ */
+  async autoComplete(ctx) {
+    await getAutoComplete(ctx.query.s).then(function (result) {
+      console.log(result.hits.hits);
+      let results = result.hits.hits;
+      let cResults = [];
+      for (let pResult of results) {
+        cResults.push(pResult._source);
+      }
+      ctx.body = cResults;
+    });
+  }
   /**
    * Info about the api here
    * @param {ctx} Koa Context
    */
-  async info (ctx) {
+  async info(ctx) {
     ctx.body = 'Info...';
   }
 
@@ -64,7 +113,7 @@ class LighthouseControllers {
    * Status of the api here
    * @param {ctx} Koa Context
    */
-  async status (ctx) {
+  async status(ctx) {
     ctx.body = getStats();
   }
 
