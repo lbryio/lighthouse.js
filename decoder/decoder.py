@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import json
+import json, os
 from bitcoinrpc.authproxy import AuthServiceProxy
 from lbryschema.decode import smart_decode
 from flask import Flask, url_for
@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 
 def get_lbrycrdd_connection_details():
-    with open('config.json', 'r') as f:
+    with open(os.path.dirname(os.path.realpath(__file__))+'/config.json', 'r') as f:
         config = json.load(f)
     rpc_user = config['rpc_user']
     rpc_pass = config['rpc_password']
