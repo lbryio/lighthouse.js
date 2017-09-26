@@ -12,6 +12,7 @@ import rp from 'request-promise';
 import appRoot from 'app-root-path';
 import fs from 'fs';
 import fileExists from 'file-exists';
+import PropertiesReader from 'properties-reader';
 
 const loggerStream = winstonStream(winston, 'info');
 const eclient = new elasticsearch.Client({
@@ -24,23 +25,47 @@ const eclient = new elasticsearch.Client({
   },
 });
 const queue = new ElasticQueue({elastic: eclient});
-const client = new bitcoin.Client({
-  host   : 'localhost',
-  port   : 9245,
-  user   : 'lbry',
-  pass   : 'lbry',
-  timeout: 30000,
+let client;
+
+//Get the lbrycrd config from the .lbrycrd folder.
+fileExists(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'), (err, exists) => {
+  if (err) { throw err };
+  let config = {'username': 'lbry', 'password': 'lbry', 'rpc_port': 9245};
+  if (exists) {
+    let prop = PropertiesReader(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'));
+    config.username = prop.get('rpcuser');
+    config.password = prop.get('rpcpassword');
+    config.rpc_port = prop.get('rpcport');
+    client = new bitcoin.Client({
+      host   : 'localhost',
+      port   : config.rpc_port,
+      user   : config.username,
+      pass   : config.password,
+      timeout: 30000,
+    });
+  } else {
+    client = new bitcoin.Client({
+      host   : 'localhost',
+      port   : config.rpc_port,
+      user   : config.username,
+      pass   : config.password,
+      timeout: 30000,
+    });
+  }
 });
+
+//Check that our cache file exist.
+fileExists(path.join(appRoot.path, 'claimTrieCache.json'), (err, exists) => {
+  if (err) { throw err };
+  if (!exists) {
+    fs.writeFileSync(path.join(appRoot.path, 'claimTrieCache.json'), '[]');
+  }
+});
+
 let status = {};
 
 export async function sync () {
   try {
-    fileExists(path.join(appRoot.path, 'claimTrieCache.json'), (err, exists) => {
-      if (err) { throw err };
-      if (!exists) {
-        fs.writeFileSync(path.join(appRoot.path, 'claimTrieCache.json'), '[]');
-      }
-    });
     status.info = 'Grabbing the claimTrie...';
     let claimTrie = await client.getClaimsInTrie().then(claimtrie => { return claimtrie }).catch(err => { throw err });
     let txList = [];
