@@ -73,6 +73,19 @@ function getAutoComplete (input) {
   });
 }
 
+function getStatus () {
+  return new Promise((resolve, reject) => {
+    rp(`http://localhost:9200/claims/_stats`)
+      .then(function (data) {
+        data = JSON.parse(data);
+        resolve({status: getStats().info, spaceUsed: pretty(data._all.total.store.size_in_bytes, true), claimsInIndex: data._all.total.indexing.index_total, totSearches: data._all.total.search.query_total});
+      })
+      .catch(function (err) {
+        reject(err);
+      });
+  });
+}
+
 class LighthouseControllers {
   /* eslint-disable no-param-reassign */
   // Start syncing blocks...
@@ -134,14 +147,7 @@ class LighthouseControllers {
    * @param {ctx} Koa Context
    */
   async status (ctx) {
-    rp('http://localhost:9200/claims/_stats')
-    .then(function (data) {
-      data = JSON.parse(data);
-      ctx.body = {status: getStats().info, spaceUsed: pretty(data._all.total.store.size_in_bytes, true), claimsInIndex: data._all.total.indexing.index_total, totSearches: data._all.total.search.query_total};
-    })
-    .catch(function (err) {
-      ctx.body = err;
-    });
+    ctx.body = await getStatus();
   }
 
   /* eslint-enable no-param-reassign */

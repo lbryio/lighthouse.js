@@ -26,34 +26,40 @@ const eclient = new elasticsearch.Client({
   },
 });
 const queue = new ElasticQueue({elastic: eclient});
-let client;
 
 //Get the lbrycrd config from the .lbrycrd folder.
-fileExists(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'), (err, exists) => {
-  if (err) { throw err };
+function getClient () {
+  return new Promise((resolve, reject) => {
+  fileExists(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'), (err, exists) => {
+  if (err) { reject(err) };
   let config = {'username': 'lbry', 'password': 'lbry', 'rpc_port': 9245};
   if (exists) {
     let prop = PropertiesReader(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'));
     config.username = prop.get('rpcuser');
     config.password = prop.get('rpcpassword');
     config.rpc_port = prop.get('rpcport');
-    client = new bitcoin.Client({
+    let client = new bitcoin.Client({
       host   : 'localhost',
       port   : config.rpc_port,
       user   : config.username,
       pass   : config.password,
       timeout: 30000,
     });
+    resolve(client);
   } else {
-    client = new bitcoin.Client({
+    let client = new bitcoin.Client({
       host   : 'localhost',
       port   : config.rpc_port,
       user   : config.username,
       pass   : config.password,
       timeout: 30000,
     });
+    resolve(client);
   }
 });
+  });
+}
+
 
 //Check that our cache file exist.
 fileExists(path.join(appRoot.path, 'claimTrieCache.json'), (err, exists) => {
@@ -67,6 +73,7 @@ let status = {};
 
 export async function sync () {
   try {
+    let client = await getClient();
     status.info = 'gettingClaimTrie';
     let claimTrie = await client.getClaimsInTrie().then(claimtrie => { return claimtrie }).catch(err => { throw err });
     let txList = [];
@@ -81,10 +88,11 @@ export async function sync () {
         latestClaimTrie.push(claimTrie[i].claims[o].claimId);
       }
     }
+    status.info = 'calculatingClaimTrie';
     let oldClaimTrie = await getJSON(path.join(appRoot.path, 'claimTrieCache.json')); // get our old claimTrieCache....
     let added = await getAddedClaims(oldClaimTrie, latestClaimTrie); // get all new that should be added
     let removed = await getRemovedClaims(oldClaimTrie, latestClaimTrie); // get all old that should be removed
-    status.info = 'calculatingClaimTrie';
+    status.info = 'updatingIndex';
     for (let claimId of added) { // for all new get their tx info and add to database
       let tx = txList.find(x => x.claimId === claimId);
       if (typeof tx !== 'undefined') {
