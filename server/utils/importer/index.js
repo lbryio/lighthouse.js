@@ -10,6 +10,8 @@ import jsonfile from 'jsonfile';
 import path from 'path';
 import rp from 'request-promise';
 import appRoot from 'app-root-path';
+import fs from 'fs';
+import fileExists from 'file-exists';
 
 const loggerStream = winstonStream(winston, 'info');
 const eclient = new elasticsearch.Client({
@@ -33,6 +35,12 @@ let status = {};
 
 export async function sync () {
   try {
+    fileExists(path.join(appRoot.path, 'claimTrieCache.json'), (err, exists) => {
+      if (err) { throw err };
+      if (!exists) {
+        fs.writeFileSync(path.join(appRoot.path, 'claimTrieCache.json'), '[]');
+      }
+    });
     status.info = 'Grabbing the claimTrie...';
     let claimTrie = await client.getClaimsInTrie().then(claimtrie => { return claimtrie }).catch(err => { throw err });
     let txList = [];

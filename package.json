@@ -39,6 +39,7 @@
     "chalk": "^2.0.1",
     "elastic-queue": "^0.3.0",
     "elasticsearch": "^13.2.0",
+    "file-exists": "^4.0.0",
     "glob": "^7.1.1",
     "jsonfile": "^3.0.1",
     "jsonwebtoken": "^7.2.1",
