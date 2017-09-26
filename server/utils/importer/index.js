@@ -13,6 +13,7 @@ import appRoot from 'app-root-path';
 import fs from 'fs';
 import fileExists from 'file-exists';
 import PropertiesReader from 'properties-reader';
+import os from 'os';
 
 const loggerStream = winstonStream(winston, 'info');
 const eclient = new elasticsearch.Client({
