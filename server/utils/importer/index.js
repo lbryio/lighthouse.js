@@ -10,6 +10,10 @@ import jsonfile from 'jsonfile';
 import path from 'path';
 import rp from 'request-promise';
 import appRoot from 'app-root-path';
+import fs from 'fs';
+import fileExists from 'file-exists';
+import PropertiesReader from 'properties-reader';
+import os from 'os';
 
 const loggerStream = winstonStream(winston, 'info');
 const eclient = new elasticsearch.Client({
@@ -22,18 +26,55 @@ const eclient = new elasticsearch.Client({
   },
 });
 const queue = new ElasticQueue({elastic: eclient});
-const client = new bitcoin.Client({
-  host   : 'localhost',
-  port   : 9245,
-  user   : 'lbry',
-  pass   : 'lbry',
-  timeout: 30000,
+
+//Get the lbrycrd config from the .lbrycrd folder.
+function getClient () {
+  return new Promise((resolve, reject) => {
+  fileExists(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'), (err, exists) => {
+  if (err) { reject(err) };
+  let config = {'username': 'lbry', 'password': 'lbry', 'rpc_port': 9245};
+  if (exists) {
+    let prop = PropertiesReader(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'));
+    config.username = prop.get('rpcuser');
+    config.password = prop.get('rpcpassword');
+    config.rpc_port = prop.get('rpcport');
+    let client = new bitcoin.Client({
+      host   : 'localhost',
+      port   : config.rpc_port,
+      user   : config.username,
+      pass   : config.password,
+      timeout: 30000,
+    });
+    resolve(client);
+  } else {
+    let client = new bitcoin.Client({
+      host   : 'localhost',
+      port   : config.rpc_port,
+      user   : config.username,
+      pass   : config.password,
+      timeout: 30000,
+    });
+    resolve(client);
+  }
 });
+  });
+}
+
+
+//Check that our cache file exist.
+fileExists(path.join(appRoot.path, 'claimTrieCache.json'), (err, exists) => {
+  if (err) { throw err };
+  if (!exists) {
+    fs.writeFileSync(path.join(appRoot.path, 'claimTrieCache.json'), '[]');
+  }
+});
+
 let status = {};
 
 export async function sync () {
   try {
-    status.info = 'Grabbing the claimTrie...';
+    let client = await getClient();
+    status.info = 'gettingClaimTrie';
     let claimTrie = await client.getClaimsInTrie().then(claimtrie => { return claimtrie }).catch(err => { throw err });
     let txList = [];
     let latestClaimTrie = [];
@@ -47,10 +88,11 @@ export async function sync () {
         latestClaimTrie.push(claimTrie[i].claims[o].claimId);
       }
     }
+    status.info = 'calculatingClaimTrie';
     let oldClaimTrie = await getJSON(path.join(appRoot.path, 'claimTrieCache.json')); // get our old claimTrieCache....
     let added = await getAddedClaims(oldClaimTrie, latestClaimTrie); // get all new that should be added
     let removed = await getRemovedClaims(oldClaimTrie, latestClaimTrie); // get all old that should be removed
-    status.info = 'Adding/Removing Claims, please wait...';
+    status.info = 'updatingIndex';
     for (let claimId of added) { // for all new get their tx info and add to database
       let tx = txList.find(x => x.claimId === claimId);
       if (typeof tx !== 'undefined') {
@@ -82,7 +124,7 @@ export async function sync () {
     }
     // Done adding, update our claimTrie cache to latest and wait a bit...
     await saveJSON(path.join(appRoot.path, 'claimTrieCache.json'), latestClaimTrie);
-    status.info = 'Done updating the claimTrieCache, waiting 5 minutes before doing a recheck..';
+    status.info = 'upToDate';
     await sleep(300000);
     sync();
   } catch (err) {
