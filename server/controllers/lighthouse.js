@@ -3,6 +3,8 @@ import winston from 'winston';
 import winstonStream from 'winston-stream';
 import { sync, getStats } from '../utils/importer';
 import elasticsearch from 'elasticsearch';
+import rp from 'request-promise';
+import pretty from 'prettysize';
 
 const loggerStream = winstonStream(winston, 'info');
 
@@ -124,7 +126,7 @@ class LighthouseControllers {
    * @param {ctx} Koa Context
    */
   async info (ctx) {
-    ctx.body = 'Lighthouse';
+    ctx.body = 'Lighthouse search API';
   }
 
   /**
@@ -132,7 +134,14 @@ class LighthouseControllers {
    * @param {ctx} Koa Context
    */
   async status (ctx) {
-    ctx.body =  eclient.getStats();
+    rp('http://localhost:9200/claims/_stats')
+    .then(function (data) {
+      data = JSON.parse(data);
+      ctx.body = {status: getStats().info, spaceUsed: pretty(data._all.total.store.size_in_bytes, true), claimsInIndex: data._all.total.indexing.index_total, totSearches: data._all.total.search.query_total};
+    })
+    .catch(function (err) {
+      ctx.body = err;
+    });
   }
 
   /* eslint-enable no-param-reassign */

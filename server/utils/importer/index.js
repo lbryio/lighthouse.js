@@ -67,7 +67,7 @@ let status = {};
 
 export async function sync () {
   try {
-    status.info = 'Grabbing the claimTrie...';
+    status.info = 'gettingClaimTrie';
     let claimTrie = await client.getClaimsInTrie().then(claimtrie => { return claimtrie }).catch(err => { throw err });
     let txList = [];
     let latestClaimTrie = [];
@@ -84,7 +84,7 @@ export async function sync () {
     let oldClaimTrie = await getJSON(path.join(appRoot.path, 'claimTrieCache.json')); // get our old claimTrieCache....
     let added = await getAddedClaims(oldClaimTrie, latestClaimTrie); // get all new that should be added
     let removed = await getRemovedClaims(oldClaimTrie, latestClaimTrie); // get all old that should be removed
-    status.info = 'Adding/Removing Claims, please wait...';
+    status.info = 'calculatingClaimTrie';
     for (let claimId of added) { // for all new get their tx info and add to database
       let tx = txList.find(x => x.claimId === claimId);
       if (typeof tx !== 'undefined') {
@@ -116,7 +116,7 @@ export async function sync () {
     }
     // Done adding, update our claimTrie cache to latest and wait a bit...
     await saveJSON(path.join(appRoot.path, 'claimTrieCache.json'), latestClaimTrie);
-    status.info = 'Done updating the claimTrieCache, waiting 5 minutes before doing a recheck..';
+    status.info = 'upToDate';
     await sleep(300000);
     sync();
   } catch (err) {
