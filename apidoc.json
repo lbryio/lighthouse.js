@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "Lighthouse - Next-gen search api for LBRY",
   "title": "Lighthouse API DOCS",
-  "url" : "http://localhost/api/lighthouse",
-  "sampleUrl": "http://localhost/api/lighthouse",
+  "url" : "http://localhost",
+  "sampleUrl": "http://localhost",
   "json_body": true,
   "template": {
   	"withCompare": true,

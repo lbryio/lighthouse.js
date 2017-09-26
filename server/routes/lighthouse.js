@@ -1,15 +1,10 @@
 import 'babel-polyfill';
 import Router from 'koa-router';
-import { baseApi } from '../config';
 import LighthouseControllers from '../controllers/lighthouse';
 
 LighthouseControllers.startSync();
 
-const api = 'lighthouse';
-
 const router = new Router();
-
-router.prefix(`/${baseApi}/${api}`);
 
 // GET /api/lighthouse
 router.get('/', LighthouseControllers.info);
