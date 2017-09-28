@@ -3,8 +3,8 @@ define({
   "version": "0.0.1",
   "description": "Lighthouse - Next-gen search api for LBRY",
   "title": "Lighthouse API DOCS",
-  "url": "http://localhost/api/lighthouse",
-  "sampleUrl": "http://localhost/api/lighthouse",
+  "url": "http://localhost",
+  "sampleUrl": "http://localhost",
   "json_body": true,
   "template": {
     "withCompare": true,
@@ -14,7 +14,7 @@ define({
   "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2017-09-20T20:49:14.871Z",
+    "time": "2017-09-28T20:31:59.344Z",
     "url": "http://apidocjs.com",
     "version": "0.17.6"
   }

@@ -50,7 +50,7 @@
     "name": "GetAutocomplete",
     "sampleRequest": [
       {
-        "url": "http://localhost/api/lighthouse/autocomplete"
+        "url": "http://localhost/autocomplete"
       }
     ]
   },
@@ -147,7 +147,7 @@
     "name": "GetSearch",
     "sampleRequest": [
       {
-        "url": "http://localhost/api/lighthouse/search"
+        "url": "http://localhost/search"
       }
     ]
   },
@@ -182,7 +182,7 @@
     "name": "GetStatus",
     "sampleRequest": [
       {
-        "url": "http://localhost/api/lighthouse/status"
+        "url": "http://localhost/status"
       }
     ]
   }
