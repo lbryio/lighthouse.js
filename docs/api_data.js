@@ -19,7 +19,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Example",
-          "content": "http://localhost/api/lighthouse/autocomplete?s=fillerino",
+          "content": "http://localhost/autocomplete?s=fillerino",
           "type": "url"
         }
       ]
@@ -88,7 +88,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Example",
-          "content": "http://localhost/api/lighthouse/search?s=fillerino",
+          "content": "http://localhost/search?s=fillerino",
           "type": "url"
         }
       ]
