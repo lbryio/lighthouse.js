@@ -139,7 +139,7 @@ class LighthouseControllers {
    * @param {ctx} Koa Context
    */
   async info (ctx) {
-    ctx.body = 'Lighthouse search API';
+    ctx.redirect('https://github.com/lbryio/lighthouse');
   }
 
   /**
