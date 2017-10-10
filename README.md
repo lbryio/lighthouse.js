@@ -12,6 +12,9 @@
 ## DEVELOPMENT NOTES:
 > Stuff needed to be worked on are located in issues or in the project board.
 
+## API Documentation
+
+[The full API documentation](https://lbryio.github.io/lighthouse/)
 
 ## Running
 Install dependencies
