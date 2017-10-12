@@ -3,6 +3,7 @@
 
 ## What is Lighthouse?
 >Lighthouse is a lightning-fast advanced search engine API for publications on the lbrycrd with autocomplete capabilities.
+>The official lighthouse instance is live at https://lighthouse.lbry.io
 
 ## What does Lighthouse consist of?
 >1. Elasticsearch as a backend db server.
