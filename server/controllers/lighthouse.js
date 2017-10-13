@@ -18,6 +18,7 @@ const eclient = new elasticsearch.Client({
   },
 });
 
+
 function getResults (input) {
   if (input.size === undefined) input.size = 10;
   if (input.from === undefined) input.from = 0;
@@ -46,30 +47,57 @@ function getResults (input) {
   });
 }
 
-function getAutoComplete (input) {
-  if (input.size === undefined) input.size = 10;
-  if (input.from === undefined) input.from = 0;
+function getIndex() {
+  // ideally, data is inserted into elastic search with an index that helps us query it faster/better results
+  // A simple start is to default queries to be within the n months, and to make a new index each month.
+  return;
+}
+
+function getRoutingKey() {
+  // This is the most important field for performance. Being able to route the queries ahead of time can make typedowns insanely good.
+  return;
+}
+
+function getAutoCompleteQuery(query) {
+  return {
+    multi_match: {
+      query: query.s.trim(),
+      type: 'phrase_prefix',
+      slop: 5,
+      max_expansions: 50,
+      fields: [
+        'name',
+        'value.stream.metadata.author',
+        'value.stream.metadata.title',
+        'value.stream.metadata.description'
+      ]
+    }
+  };
+}
+
+function getFilter(query) {
+  // this is the best place for putting things like filtering on the type of content
+  // Perhaps we can add search param that will filter on how people have categorized / tagged their content
+  return;
+}
+
+function getAutoComplete(query) {
   return eclient.search({
-    index  : 'claims',
-    _source: ['name', 'value.stream.metadata.title', 'value.stream.metadata.author'],
-    body   : {
-      'query': {
-        'bool': {
-          'must': {
-            'query_string': {
-              'query' : '*' + input.s.trim() + '*',
-              'fields': [
-                'name',
-                'value.stream.metadata.title',
-                'value.stream.metadata.author',
-              ],
-            },
-          },
-        },
-      },
-      size: input.size,
-      from: input.from,
+    index: getIndex(query) || 'claims',
+    routing: getRoutingKey(query),
+    ignore_unavailable: true, // ignore error when date index does not exist
+    body: {
+      size: query.size || 5,
+      from: query.from || 0,
+      query: {
+        bool: {
+          must: getAutoCompleteQuery(query),
+          filter: getFilter(query)
+        }
+      }
     },
+    size: query.size,
+    from: query.from,
   });
 }
 
