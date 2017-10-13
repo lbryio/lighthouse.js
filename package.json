@@ -26,6 +26,7 @@
     "start": "nodemon server/ --exec babel-node --ignore 'claimTrieCache.json'",
     "build": "babel server -d dist",
     "lint": "eslint ./server",
+    "lint-fix": "npm run lint -- --fix",
     "test": "npm run lint && npm run mocha",
     "prod": "npm run build && node dist/",
     "mocha": "./node_modules/.bin/mocha --compilers js:babel-register --require babel-polyfill",
