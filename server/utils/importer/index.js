@@ -27,41 +27,40 @@ const eclient = new elasticsearch.Client({
 });
 const queue = new ElasticQueue({elastic: eclient});
 
-//Get the lbrycrd config from the .lbrycrd folder.
+// Get the lbrycrd config from the .lbrycrd folder.
 function getClient () {
   return new Promise((resolve, reject) => {
-  fileExists(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'), (err, exists) => {
-  if (err) { reject(err) };
-  let config = {'username': 'lbry', 'password': 'lbry', 'rpc_port': 9245};
-  if (exists) {
-    let prop = PropertiesReader(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'));
-    config.username = prop.get('rpcuser');
-    config.password = prop.get('rpcpassword');
-    config.rpc_port = prop.get('rpcport');
-    let client = new bitcoin.Client({
-      host   : 'localhost',
-      port   : config.rpc_port,
-      user   : config.username,
-      pass   : config.password,
-      timeout: 30000,
+    fileExists(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'), (err, exists) => {
+      if (err) { reject(err) };
+      let config = {'username': 'lbry', 'password': 'lbry', 'rpc_port': 9245};
+      if (exists) {
+        let prop = PropertiesReader(path.join(os.homedir(), '.lbrycrd/lbrycrd.conf'));
+        config.username = prop.get('rpcuser');
+        config.password = prop.get('rpcpassword');
+        config.rpc_port = prop.get('rpcport');
+        let client = new bitcoin.Client({
+          host   : 'localhost',
+          port   : config.rpc_port,
+          user   : config.username,
+          pass   : config.password,
+          timeout: 30000,
+        });
+        resolve(client);
+      } else {
+        let client = new bitcoin.Client({
+          host   : 'localhost',
+          port   : config.rpc_port,
+          user   : config.username,
+          pass   : config.password,
+          timeout: 30000,
+        });
+        resolve(client);
+      }
     });
-    resolve(client);
-  } else {
-    let client = new bitcoin.Client({
-      host   : 'localhost',
-      port   : config.rpc_port,
-      user   : config.username,
-      pass   : config.password,
-      timeout: 30000,
-    });
-    resolve(client);
-  }
-});
   });
 }
 
-
-//Check that our cache file exist.
+// Check that our cache file exist.
 fileExists(path.join(appRoot.path, 'claimTrieCache.json'), (err, exists) => {
   if (err) { throw err };
   if (!exists) {
