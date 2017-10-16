@@ -1,5 +1,5 @@
 # Lighthouse - A lightning fast search for the LBRY blockchain 
-**Created by _filipnyquist_ <filip@lbry.io> and _billbitt_ <bill@lbry.io>**
+**Created by _filipnyquist_ <filip@lbry.io> and the community!**
 
 ## What is Lighthouse?
 >Lighthouse is a lightning-fast advanced search engine API for publications on the lbrycrd with autocomplete capabilities.
@@ -9,36 +9,45 @@
 >1. Elasticsearch as a backend db server.
 >2. LBRYimport, a importer that imports the claims into the Elasticsearch database.
 >3. Lighthouse API server, which serves the API and does all calculations about what to send to the end user. 
-
-## DEVELOPMENT NOTES:
-> Stuff needed to be worked on are located in issues or in the project board.
-
 ## API Documentation
 
 [The full API documentation](https://lbryio.github.io/lighthouse/)
 
-## Running
-Install dependencies
+## Running Lighthouse
+### Prerequisites
+* Node v8
+* Yarn 
+* Python2.7
+* [Elasticsearch](https://www.elastic.co/downloads/elasticsearch)
+
+
+>To get started you should clone the git:
+```
+git clone https://github.com/lbryio/lighthouse
+```
+>Grab the latest release of lbrycrd here:
+
+[Download lbrycrd](https://github.com/lbryio/lbrycrd/releases)
+>Create a lbrycrd config file at ~/.lbrycrd/lbrycrd.conf which contains rpcuser,rpcpassword and rpcport. Then run lbrycrd in the background with that config file.
+
+>Make sure elasticsearch is running and run(from the lighthouse dir):
+```
+./gendb.sh
+```
+>Install dependencies:
 ```
 yarn install --production=false
 ```
-
-Start a Local Server
+>Start a instance of the decoder:
 ```
-npm start
+cd decoder && pip install -r requirements.txt && python decoder.py
 ```
-
-Run Test
+>Build and run Lighthouse:
 ```
-npm test
+yarn run prod
 ```
-
-Building and Running Production Server
-```
-npm run prod
-```
-
-**Note : Please make sure your elasticsearch server is running before using ```npm start``` or ```npm run prod```**
+>WOO! You are now up and running! You can connect to lighthouse at http://localhost:50005, api documentation is [here](https://lbryio.github.io/lighthouse/).
+Lighthouse will continue syncing in the background so it could take approx 10-15minutes before all claims are up to date in database.
 
 ## License
-MIT &copy; [LBRYio, Filip Nyquist, Bill Bittner](https://github.com/lbryio)
+MIT &copy; [LBRYio, Filip Nyquist](https://github.com/lbryio)
