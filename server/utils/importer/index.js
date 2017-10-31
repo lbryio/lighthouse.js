@@ -124,7 +124,7 @@ export async function sync () {
     // Done adding, update our claimTrie cache to latest and wait a bit...
     await saveJSON(path.join(appRoot.path, 'claimTrieCache.json'), latestClaimTrie);
     status.info = 'upToDate';
-    await sleep(300000);
+    await sleep(600000);
     sync();
   } catch (err) {
     winston.log(err);
