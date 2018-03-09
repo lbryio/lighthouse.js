@@ -28,6 +28,45 @@ function getResults (input) {
     body   : {
       'query': {
         'bool': {
+          'should': [
+            {
+              'match': {
+                'name^100': '*' + input.s.trim() + '*',
+              },
+            },
+            {
+              'nested': { // Need nested query because value is a nested object on the elastic document
+                'path' : 'value',
+                'query': {
+                  'bool': {
+                    'should': [
+                      {
+                        'match': {
+                          'value.stream.metadata.title': '*' + input.s.trim() + '*',
+                        },
+                      },
+                      {
+                        'match': {
+                          'value.stream.metadata.author': '*' + input.s.trim() + '*',
+                        },
+                      },
+                      {
+                        'match': {
+                          'value.stream.metadata.description': '*' + input.s.trim() + '*',
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+    /* body   : {
+      'query': {
+        'bool': {
           'must': {
             'query_string': {
               'query' : '*' + input.s.trim() + '*',
@@ -43,7 +82,7 @@ function getResults (input) {
       },
       size: input.size,
       from: input.from,
-    },
+    }, */
   });
 }
 
