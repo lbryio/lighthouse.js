@@ -32,7 +32,7 @@ function getResults (input) {
               'match': {
                 'name': {
                   'query': '*' + input.s.trim() + '*',
-                  'boost': 100,
+                  'boost': 5,
                 },
               },
             },
