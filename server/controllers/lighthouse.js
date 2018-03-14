@@ -18,7 +18,6 @@ const eclient = new elasticsearch.Client({
   },
 });
 
-
 function getResults (input) {
   if (input.size === undefined) input.size = 10;
   if (input.from === undefined) input.from = 0;
@@ -31,7 +30,10 @@ function getResults (input) {
           'should': [
             {
               'match': {
-                'name^100': '*' + input.s.trim() + '*',
+                'name': {
+                  'query': '*' + input.s.trim() + '*',
+                  'boost': 100,
+                },
               },
             },
             {
@@ -86,54 +88,54 @@ function getResults (input) {
   });
 }
 
-function getIndex() {
+function getIndex () {
   // ideally, data is inserted into elastic search with an index that helps us query it faster/better results
   // A simple start is to default queries to be within the n months, and to make a new index each month.
-  return;
+
 }
 
-function getRoutingKey() {
+function getRoutingKey () {
   // This is the most important field for performance. Being able to route the queries ahead of time can make typedowns insanely good.
-  return;
+
 }
 
-function getAutoCompleteQuery(query) {
+function getAutoCompleteQuery (query) {
   return {
     multi_match: {
-      query: query.s.trim(),
-      type: 'phrase_prefix',
-      slop: 5,
+      query         : query.s.trim(),
+      type          : 'phrase_prefix',
+      slop          : 5,
       max_expansions: 50,
-      fields: [
+      fields        : [
         'name',
         'value.stream.metadata.author',
         'value.stream.metadata.title',
-        'value.stream.metadata.description'
-      ]
-    }
+        'value.stream.metadata.description',
+      ],
+    },
   };
 }
 
-function getFilter(query) {
+function getFilter (query) {
   // this is the best place for putting things like filtering on the type of content
   // Perhaps we can add search param that will filter on how people have categorized / tagged their content
-  return;
+
 }
 
-function getAutoComplete(query) {
+function getAutoComplete (query) {
   return eclient.search({
-    index: getIndex(query) || 'claims',
-    routing: getRoutingKey(query),
+    index             : getIndex(query) || 'claims',
+    routing           : getRoutingKey(query),
     ignore_unavailable: true, // ignore error when date index does not exist
-    body: {
-      size: query.size || 5,
-      from: query.from || 0,
+    body              : {
+      size : query.size || 5,
+      from : query.from || 0,
       query: {
         bool: {
-          must: getAutoCompleteQuery(query),
-          filter: getFilter(query)
-        }
-      }
+          must  : getAutoCompleteQuery(query),
+          filter: getFilter(query),
+        },
+      },
     },
     size: query.size,
     from: query.from,
@@ -191,7 +193,7 @@ class LighthouseControllers {
         }
       }
 
-      var clean = new Array();
+      var clean = [];
       for (var i = 0; i < cResults.length; i++) {
         if (cResults[i] && cResults[i].length > 3 && clean.indexOf(cResults[i]) === -1) {
           clean.push(cResults[i]);
