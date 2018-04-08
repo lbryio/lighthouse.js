@@ -146,7 +146,7 @@ class LighthouseControllers {
       let cResults = [];
       for (let pResult of results) {
         cResults.push(pResult._source.name);
-        if (pResult._source.value !== undefined) {
+        if (pResult._source.value.stream !== undefined) {
           cResults.push(pResult._source.value.stream.metadata.title);
           cResults.push(pResult._source.value.stream.metadata.author);
         }
