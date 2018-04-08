@@ -33,6 +33,7 @@
     "gendoc": "apidoc -i server/ -o docs/"
   },
   "dependencies": {
+    "@koa/cors": "^2.2.1",
     "app-root-path": "^2.0.1",
     "babel-polyfill": "^6.5.0",
     "bitcoin-promise": "filipnyquist/node-bitcoin-promise#1fbf1cb8913ca3542b66060d48ebea185661e0a7",

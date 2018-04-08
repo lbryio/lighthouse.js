@@ -1,4 +1,5 @@
 import bodyParser from 'koa-bodyparser';
+import cors from '@koa/cors';
 import Koa from 'koa';
 import logger from 'koa-logger';
 import helmet from 'koa-helmet';
@@ -16,7 +17,8 @@ const app = new Koa();
 app
   .use(logger())
   .use(bodyParser())
-  .use(helmet());
+  .use(helmet())
+  .use(cors());
 
 routing(app);
 
