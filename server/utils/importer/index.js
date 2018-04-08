@@ -121,6 +121,24 @@ export async function sync () {
         }
       });
     }
+    winston.log('info', '[Importer] Removing blocked claims from search!');
+    var util = require('./util.js');
+    var blockedOutputsResponse = await getBlockedOutpoints();
+    var outpointlist = JSON.parse(blockedOutputsResponse);
+    for (let outpoint of outpointlist.data.outpoints) {
+      var claimid = util.OutpointToClaimId(outpoint);
+      console.log('Deleting ClaimId: ' + claimid);
+      eclient.delete({
+        index: 'claims',
+        type : 'claim',
+        id   : claimid,
+      }, function (error, response) {
+        if (error) {
+          winston.log(error);
+        }
+      });
+    }
+
     // Done adding, update our claimTrie cache to latest and wait a bit...
     await saveJSON(path.join(appRoot.path, 'claimTrieCache.json'), latestClaimTrie);
     status.info = 'upToDate';
@@ -149,6 +167,18 @@ function getRemovedClaims (oldClaimTrie, newClaimTrie) {
     let a = new Set(oldClaimTrie);
     let b = new Set(newClaimTrie);
     resolve(new Set([...a].filter(x => !b.has(x))));
+  });
+}
+
+function getBlockedOutpoints () {
+  return new Promise((resolve, reject) => {
+    rp(`http://api.lbry.io/file/list_blocked`)
+      .then(function (htmlString) {
+        resolve(htmlString);
+      })
+      .catch(function (err) {
+        reject(err);
+      });
   });
 }
 
