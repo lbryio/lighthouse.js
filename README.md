@@ -1,19 +1,16 @@
-# Lighthouse - A lightning fast search for the LBRY blockchain 
-**Created by _filipnyquist_ <filip@lbry.io> and the community!**
-
-## What is Lighthouse?
+# Lighthouse - A lightning fast search for the LBRY blockchain
 >Lighthouse is a lightning-fast advanced search engine API for publications on the lbrycrd with autocomplete capabilities.
->The official lighthouse instance is live at https://lbryio.github.io/lighthouse/
+>The official lighthouse instance is live at https://lighthouse.lbry.io
 
-## What does Lighthouse consist of?
+### What does Lighthouse consist of?
 >1. Elasticsearch as a backend db server.
 >2. LBRYimport, an importer that imports the claims into the Elasticsearch database.
 >3. Lighthouse API server, which serves the API and does all calculations about what to send to the end user. 
-## API Documentation
+### API Documentation
 
 [The full API documentation](https://lbryio.github.io/lighthouse/)
 
-## Running Lighthouse
+## Installation
 ### Prerequisites
 * Node v8
 * Yarn 
@@ -46,8 +43,16 @@ cd decoder && pip install -r requirements.txt && python decoder.py
 ```
 yarn run prod
 ```
->WOO! You are now up and running! You can connect to lighthouse at http://localhost:50005, api documentation is [here](https://lbryio.github.io/lighthouse/).
-Lighthouse will continue syncing in the background, usually takes 10-15 minutes before all claims are up to date in the database.
+>You are now up and running! You can connect to lighthouse at http://localhost:50005, api documentation is [here](https://lbryio.github.io/lighthouse/).
+Lighthouse will continue syncing in the background. It usually takes ~15 minutes before all claims are up to date in the database.
+
+## Contributing
+
+Contributions to this project are welcome, encouraged, and compensated. For more details, see [lbry.io/faq/contributing](https://lbry.io/faq/contributing)
 
 ## License
-MIT &copy; [LBRYio, Filip Nyquist](https://github.com/lbryio)
+This project is MIT Licensed &copy; [LBRYio, Filip Nyquist](https://github.com/lbryio)
+
+## Contact
+
+The primary contact for this project is [@filipnyquist](https://github.com/filipnyquist) (filip@lbry.io)
