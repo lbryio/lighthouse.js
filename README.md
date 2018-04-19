@@ -1,11 +1,13 @@
 # Lighthouse - A lightning fast search for the LBRY blockchain
->Lighthouse is a lightning-fast advanced search engine API for publications on the lbrycrd with autocomplete capabilities.
->The official lighthouse instance is live at https://lighthouse.lbry.io
+
+Lighthouse is a lightning-fast advanced search engine API for publications on the lbrycrd with autocomplete capabilities.
+The official lighthouse instance is live at https://lighthouse.lbry.io
 
 ### What does Lighthouse consist of?
->1. Elasticsearch as a backend db server.
->2. LBRYimport, an importer that imports the claims into the Elasticsearch database.
->3. Lighthouse API server, which serves the API and does all calculations about what to send to the end user. 
+
+1. Elasticsearch as a backend db server.
+2. LBRYimport, an importer that imports the claims into the Elasticsearch database.
+3. Lighthouse API server, which serves the API and does all calculations about what to send to the end user. 
 ### API Documentation
 
 [The full API documentation](https://lbryio.github.io/lighthouse/)
