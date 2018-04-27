@@ -126,6 +126,8 @@ function getResults (input) {
           ],
         },
       },
+      size: input.size,
+      from: input.from,
     },
     /* body   : {
       'query': {
@@ -143,8 +145,6 @@ function getResults (input) {
           },
         },
       },
-      size: input.size,
-      from: input.from,
     }, */
   });
 }
