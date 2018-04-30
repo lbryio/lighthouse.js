@@ -21,6 +21,18 @@ const eclient = new elasticsearch.Client({
 function getResults (input) {
   if (input.size === undefined) input.size = 10;
   if (input.from === undefined) input.from = 0;
+  // Beamer - temp fix for https://github.com/lbryio/lighthouse/issues/67
+  if (input.size > 10000) {
+    input.size = 10000;
+    input.from = 0;
+  }
+  if (input.from > 10000) {
+    input.from = 9999;
+    input.size = 1;
+  }
+  if (input.from + input.size > 10000) {
+    input.from = 10000 - input.size;
+  }
   return eclient.search({
     index  : 'claims',
     _source: ['name', 'value', 'claimId'],
