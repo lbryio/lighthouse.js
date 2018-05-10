@@ -147,6 +147,8 @@ export async function sync () {
   } catch (err) {
     winston.log(err);
     status.err = err;
+    await sleep(600000);
+    sync();
   }
 }
 
