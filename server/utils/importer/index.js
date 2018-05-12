@@ -184,7 +184,7 @@ function getBlockedOutpoints () {
   });
 }
 
-function getValue (tx, i) {
+export function getValue (tx, i) {
   return new Promise((resolve, reject) => {
     rp(`http://localhost:5000/claim_decode/${tx}/${i}`)
       .then(function (htmlString) {
