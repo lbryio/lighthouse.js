@@ -1,10 +1,11 @@
 import 'babel-polyfill';
 import winston from 'winston';
 import winstonStream from 'winston-stream';
-import { sync, getStats } from '../utils/importer';
 import elasticsearch from 'elasticsearch';
 import rp from 'request-promise';
 import pretty from 'prettysize';
+import {claimSync} from '../utils/chainquery';
+import {getStats} from '../utils/importer';
 
 const loggerStream = winstonStream(winston, 'info');
 
@@ -233,7 +234,8 @@ class LighthouseControllers {
   // Start syncing blocks...
   startSync () {
     winston.log('info', '[Importer] Started importer, indexing claims.');
-    sync();
+    claimSync();
+    // sync(); // Old Sync
   }
   /**
    * Search API Endpoint.
