@@ -59,7 +59,6 @@ export async function claimSync () {
           weight: 30,
         };
       }
-      console.log('Push claim to elastic search: ' + claim);
       pushElastic(claim);
     }
     winston.log('info', '[Importer] Removing blocked claims from search!');
@@ -97,7 +96,7 @@ export function getStats () {
 }
 
 async function pushElastic (claim) {
-  console.log('_id:' + claim.claimId);
+  console.log('Pushing To Elastic Search claimId:' + claim.claimId);
   return new Promise(async(resolve, reject) => {
     queue.push({
       index: 'claims',
@@ -155,7 +154,7 @@ function getClaimsSince (time) {
         `value_as_json as value, ` +
         `bid_state, ` +
         `effective_amount, ` +
-        `claim_id as claimId, ` +
+        `claim_id as claimId ` +
         // `transaction_by_hash_id, ` + // txhash and vout needed to leverage old format for comparison.
         // `vout ` +
       `FROM claim ` +
