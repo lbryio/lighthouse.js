@@ -11,6 +11,7 @@ import rp from 'request-promise';
 import appRoot from 'app-root-path';
 import fs from 'fs';
 import fileExists from 'file-exists';
+import * as util from '../../utils/importer/util';
 
 const loggerStream = winstonStream(winston, 'info');
 const eclient = new elasticsearch.Client({
@@ -61,8 +62,8 @@ export async function claimSync () {
       }
       pushElastic(claim);
     }
+    winston.log('info', '[Importer] Pushed ' + claims.length + ' claims to elastic search');
     winston.log('info', '[Importer] Removing blocked claims from search!');
-    let util = require('./util.js');
     let blockedOutputsResponse = await getBlockedOutpoints();
     let outpointlist = JSON.parse(blockedOutputsResponse);
     for (let outpoint of outpointlist.data.outpoints) {
@@ -136,7 +137,7 @@ function sleep (ms) {
 
 function getBlockedOutpoints () {
   return new Promise((resolve, reject) => {
-    rp(`http://api.lbry.io/file/list_blocked`)
+    rp(`https://api.lbry.io/file/list_blocked`)
       .then(function (htmlString) {
         resolve(htmlString);
       })
@@ -155,7 +156,7 @@ function getClaimsSince (time) {
         `bid_state, ` +
         `effective_amount, ` +
         `claim_id as claimId ` +
-        // `transaction_by_hash_id, ` + // txhash and vout needed to leverage old format for comparison.
+        // `,transaction_by_hash_id, ` + // txhash and vout needed to leverage old format for comparison.
         // `vout ` +
       `FROM claim ` +
       `WHERE modified >='` + time + `'`;
