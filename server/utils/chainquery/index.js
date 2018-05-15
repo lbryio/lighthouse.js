@@ -11,6 +11,7 @@ import rp from 'request-promise';
 import appRoot from 'app-root-path';
 import fs from 'fs';
 import fileExists from 'file-exists';
+import * as util from '../../utils/importer/util';
 
 const loggerStream = winstonStream(winston, 'info');
 const eclient = new elasticsearch.Client({
@@ -59,11 +60,10 @@ export async function claimSync () {
           weight: 30,
         };
       }
-      console.log('Push claim to elastic search: ' + claim);
       pushElastic(claim);
     }
+    winston.log('info', '[Importer] Pushed ' + claims.length + ' claims to elastic search');
     winston.log('info', '[Importer] Removing blocked claims from search!');
-    let util = require('./util.js');
     let blockedOutputsResponse = await getBlockedOutpoints();
     let outpointlist = JSON.parse(blockedOutputsResponse);
     for (let outpoint of outpointlist.data.outpoints) {
@@ -97,7 +97,7 @@ export function getStats () {
 }
 
 async function pushElastic (claim) {
-  console.log('_id:' + claim.claimId);
+  console.log('Pushing To Elastic Search claimId:' + claim.claimId);
   return new Promise(async(resolve, reject) => {
     queue.push({
       index: 'claims',
@@ -137,7 +137,7 @@ function sleep (ms) {
 
 function getBlockedOutpoints () {
   return new Promise((resolve, reject) => {
-    rp(`http://api.lbry.io/file/list_blocked`)
+    rp(`https://api.lbry.io/file/list_blocked`)
       .then(function (htmlString) {
         resolve(htmlString);
       })
@@ -155,8 +155,8 @@ function getClaimsSince (time) {
         `value_as_json as value, ` +
         `bid_state, ` +
         `effective_amount, ` +
-        `claim_id as claimId, ` +
-        // `transaction_by_hash_id, ` + // txhash and vout needed to leverage old format for comparison.
+        `claim_id as claimId ` +
+        // `,transaction_by_hash_id, ` + // txhash and vout needed to leverage old format for comparison.
         // `vout ` +
       `FROM claim ` +
       `WHERE modified >='` + time + `'`;
