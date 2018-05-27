@@ -56,8 +56,8 @@ export async function claimSync () {
       // console.log('--------------------------------------------');
       if (claim.name && claim.value) {
         claim.suggest_name = {
-          input : claim.name,
-          weight: 30,
+          input : '' + claim.name + '',
+          weight: '30',
         };
       }
       pushElastic(claim);
