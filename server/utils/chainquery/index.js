@@ -13,19 +13,20 @@ import fs from 'fs';
 import fileExists from 'file-exists';
 import * as util from '../../utils/importer/util';
 
-const loggerStream = winstonStream(winston, 'info');
+const elasticsearchloglevel = 'info';
+const loggerStream = winstonStream(winston, elasticsearchloglevel);
 const eclient = new elasticsearch.Client({
   host: 'http://localhost:9200',
 
   log: {
-    level : 'info',
+    level : elasticsearchloglevel,
     type  : 'stream',
     stream: loggerStream,
   },
 });
 const queue = new ElasticQueue({elastic: eclient});
 
-// Check that our cache file exist.
+// Check that our syncState file exist.
 fileExists(path.join(appRoot.path, 'syncState.json'), (err, exists) => {
   if (err) { throw err }
   if (!exists) {
@@ -47,38 +48,20 @@ export async function claimSync () {
     status.info = 'addingClaimsToElastic';
     for (let claim of claims) {
       claim.value = JSON.parse(claim.value).Claim;
-      // console.log('NEW: ' + JSON.stringify(claim));
-      // console.log('--------------------------------------------');
-      // var imprtr = require('../importer');
-      // let oldvalue = await imprtr.getValue(claim.transaction_by_hash_id, claim.vout);
-      // oldvalue = JSON.parse(oldvalue);
-      // console.log('OLD: ' + JSON.stringify(oldvalue));
-      // console.log('--------------------------------------------');
       if (claim.name && claim.value) {
         claim.suggest_name = {
-          input : claim.name,
-          weight: 30,
+          input : '' + claim.name + '',
+          weight: '30',
         };
       }
-      pushElastic(claim);
+      if (claim.bid_state === 'Spent' || claim.bid_state === 'Expired') {
+        deleteFromElastic(claim.claimId);
+      } else {
+        pushElastic(claim);
+      }
     }
     winston.log('info', '[Importer] Pushed ' + claims.length + ' claims to elastic search');
-    winston.log('info', '[Importer] Removing blocked claims from search!');
-    let blockedOutputsResponse = await getBlockedOutpoints();
-    let outpointlist = JSON.parse(blockedOutputsResponse);
-    for (let outpoint of outpointlist.data.outpoints) {
-      let claimid = util.OutpointToClaimId(outpoint);
-      console.log('Deleting ClaimId: ' + claimid);
-      eclient.delete({
-        index: 'claims',
-        type : 'claim',
-        id   : claimid,
-      }, function (error, response) {
-        if (error) {
-          winston.log(error, response);
-        }
-      });
-    }
+    deleteBlockedClaims();
     syncState.LastSyncTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
     await saveJSON(path.join(appRoot.path, 'syncState.json'), syncState);
     status.info = 'upToDate';
@@ -96,8 +79,29 @@ export function getStats () {
   return status;
 }
 
+async function deleteBlockedClaims () {
+  winston.log('info', '[Importer] Removing blocked claims from search!');
+  let blockedOutputsResponse = await getBlockedOutpoints();
+  let outpointlist = JSON.parse(blockedOutputsResponse);
+  for (let outpoint of outpointlist.data.outpoints) {
+    let claimid = util.OutpointToClaimId(outpoint);
+    deleteFromElastic(claimid);
+  }
+  winston.log('info', '[Importer] Done processing blocked claims!');
+}
+
+async function deleteFromElastic (claimid) {
+  return new Promise(async(resolve, reject) => {
+    queue.push({
+      index: 'claims',
+      type : 'claim',
+      id   : claimid,
+      body : {},
+    });
+  });
+}
+
 async function pushElastic (claim) {
-  console.log('Pushing To Elastic Search claimId:' + claim.claimId);
   return new Promise(async(resolve, reject) => {
     queue.push({
       index: 'claims',
@@ -142,6 +146,7 @@ function getBlockedOutpoints () {
         resolve(htmlString);
       })
       .catch(function (err) {
+        winston.log('error', '[Importer] Error getting blocked outpoints. ' + err);
         reject(err);
       });
   });
@@ -167,6 +172,7 @@ function getClaimsSince (time) {
         resolve(htmlString);
       })
       .catch(function (err) {
+        winston.log('error', '[Importer] Error getting updated claims. ' + err);
         reject(err);
       });
   });
