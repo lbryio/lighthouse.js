@@ -13,12 +13,13 @@ import fs from 'fs';
 import fileExists from 'file-exists';
 import * as util from '../../utils/importer/util';
 
-const loggerStream = winstonStream(winston, 'info');
+const elasticsearchloglevel = 'info';
+const loggerStream = winstonStream(winston, elasticsearchloglevel);
 const eclient = new elasticsearch.Client({
   host: 'http://localhost:9200',
 
   log: {
-    level : 'info',
+    level : elasticsearchloglevel,
     type  : 'stream',
     stream: loggerStream,
   },
