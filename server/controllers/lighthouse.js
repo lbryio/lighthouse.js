@@ -10,7 +10,7 @@ import {getStats} from '../utils/importer';
 const loggerStream = winstonStream(winston, 'info');
 
 const eclient = new elasticsearch.Client({
-  host: 'http://localhost:9200',
+  host: process.env.ELASTIC_URL || 'http://localhost:9200',
 
   log: {
     level : 'info',
