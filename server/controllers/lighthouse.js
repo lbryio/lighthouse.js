@@ -50,15 +50,6 @@ function getResults (input) {
                 },
               },
             },
-            {
-              'function_score': {
-                'script_score': {
-                  'script': { // 100 LBC adds 1 point to the score
-                    'source': "0.00000001 * doc['effective_amount'].value",
-                  },
-                },
-              },
-            },
           ],
           'must': [
             {
