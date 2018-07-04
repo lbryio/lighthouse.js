@@ -11,14 +11,6 @@ require('winston-daily-rotate-file');
 // Setup logging
 winston.remove(winston.transports.Console);
 winston.add(winston.transports.Console, { colorize: true, timestamp: true, prettyPrint: true });
-winston.add(winston.transports.DailyRotateFile, {
-  filename: 'lighthouse-%DATE%.log',
-  dirname: './logs',
-  datePattern: 'YYYY-MM-DD-HH',
-  zippedArchive: true,
-  maxSize: '20m',
-  maxFiles: '14d',
-})
 
 // Create Koa Application
 const app = new Koa();
