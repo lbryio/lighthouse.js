@@ -30,7 +30,8 @@
     "test": "npm run lint && npm run mocha",
     "prod": "npm run build && node dist/",
     "mocha": "./node_modules/.bin/mocha --compilers js:babel-register --require babel-polyfill",
-    "gendoc": "apidoc -i server/ -o docs/"
+    "gendoc": "apidoc -i server/ -o docs/",
+    "docker-elasticsearch": "ELASTIC_URL=\"0.0.0.0:9200\" docker run -p 9200:9200 -p 9300:9300 -e \"discovery.type=single-node\" docker.elastic.co/elasticsearch/elasticsearch:5.5.3"
   },
   "dependencies": {
     "@koa/cors": "^2.2.1",
