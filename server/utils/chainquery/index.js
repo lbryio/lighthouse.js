@@ -156,15 +156,17 @@ function getClaimsSince (time) {
   return new Promise((resolve, reject) => {
     let query =  `` +
       `SELECT ` +
-        `name, ` +
-        `value_as_json as value, ` +
-        `bid_state, ` +
-        `effective_amount, ` +
-        `claim_id as claimId ` +
+        `c.name,` +
+        `p.name as channel,` +
+        `c.bid_state,` +
+        `c.effective_amount,` +
+        `c.claim_id as claimId,` +
+        `c.value_as_json as value ` +
         // `,transaction_by_hash_id, ` + // txhash and vout needed to leverage old format for comparison.
         // `vout ` +
-      `FROM claim ` +
-      `WHERE modified >='` + time + `'`;
+      `FROM claim c ` +
+      `LEFT JOIN claim p on p.claim_id = c.publisher_id ` +
+      `WHERE c.modified >='` + time + `'`;
     // Outputs full query to console for copy/paste into chainquery (debugging)
     // console.log(query);
     rp(`https://chainquery.lbry.io/api/sql?query=` + query)
