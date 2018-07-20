@@ -6,82 +6,132 @@ LighthouseControllers.startSync();
 
 const router = new Router();
 
-// GET /api/lighthouse
 router.get('/', LighthouseControllers.info);
 
 /**
- * @api {get} /search Main Search API
- * @apiGroup Search
- * @apiParam {String} s The search text (Required)
- * @apiParam {Integer} size Amount of results to return as max
- * @apiParam {Integer} from The number to start from, good for pagination.
- * @apiParamExample {url} Example
- *    http://localhost/search?s=fillerino
- * @apiSuccess {Array[]}  array List of search response, each containing the value below.
- * @apiSuccess {Object[]}  result A search result
- * @apiSuccess {String}   result.name The name of the claim.
- * @apiSuccess {String}   result.claimId The claimId of the claim.
- * @apiSuccess {Object[]}   result.value The decoded value of the metadata
- * @apiSuccessExample {json} Success
- *    HTTP/1.1 200 OK
-[
-  {
-    "name":"fillerino-js-test",
-    "claimId":"7bfed722c678a0e0ceb9fb90974bfcc65f528813",
-    "value":{
-      "version":"_0_0_1",
-      "claimType":"streamType",
-      "stream":{
-        "source":{
-          "source":"7ded8c9c7527fce26ced886adcd2eab9fc424c0126eff6572f0615ab66ec3bfbdbbfc1603d95cecd81c9b93fa8ecfbf8",
-          "version":"_0_0_1",
-          "contentType":"text/html",
-          "sourceType":"lbry_sd_hash"
-        },
-        "version":"_0_0_1",
-        "metadata":{
-          "license":"Public Domain",
-          "description":"A test file which tries to communicate with the daemon(from inside the app).",
-          "language":"en",
-          "title":"Text Javascript Injection",
-          "author":"",
-          "version":"_0_1_0",
-          "nsfw":false,
-          "licenseUrl":"",
-          "preview":"",
-          "thumbnail":""
-        }
-      }
-    }
-  },
-  {...},
-  {...}
-]
+ * @swagger
+ * definitions:
+ *   SearchItem:
+ *     type: object
+ *     required:
+ *       - name
+ *     properties:
+ *       name:
+ *         type: string
+ *         description: The name of the claim.
+ *         example: 'lbry-testclaim'
+ *       channel:
+ *         type: string
+ *         description: The name of the channel that claimed this item.
+ *         example: '@lbrytestclaim'
+ *       value:
+ *         type: object
+ *         description: The decoded value of the metadata for the item.
+ *         example: 'Here is the decoded claimdata/metadata from the claim in an object.'
+ *   AutocompleteItem:
+ *     type: string
+ *     description: A matching search string.
+ *     example: 'LBRY is amazing'
+ */
+
+/**
+ * @swagger
+ * /search:
+ *   get:
+ *     tags:
+ *       - 'Lighthouse API'
+ *     description: Make a lighthouse search.
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: s
+ *         description: The search text.
+ *         in: query
+ *         required: true
+ *         type: string
+ *         example: 'Why crypto is good!'
+ *       - name: channel
+ *         description: The specific channel you want to search.
+ *         in: query
+ *         required: false
+ *         type: string
+ *         example: 'CryptoLovers'
+ *       - name: size
+ *         description: The amount of items to get back at a maximum.
+ *         in: query
+ *         required: false
+ *         type: integer
+ *         example: 10
+ *       - name: from
+ *         description: The number to start from, good for pagination.
+ *         in: query
+ *         required: false
+ *         type: integer
+ *         example: 10
+ *     responses:
+ *       200:
+ *         description: The search returns all the found matching items.
+ *         schema:
+ *          type: array
+ *          items:
+ *            $ref: '#/definitions/SearchItem'
  */
 router.get('/search', LighthouseControllers.search);
 
 /**
- * @api {get} /autocomplete Autocomplete API
- * @apiGroup Search
- * @apiParam {String} s The text to be autocompleted (Required).
- * @apiParamExample {url} Example
- *    http://localhost/autocomplete?s=fillerino
- * @apiSuccess {Array[]}  array List of search response, each containing the value below.
- * @apiSuccessExample {json} Success
- *    HTTP/1.1 200 OK
- *
- *    ["@Fillerino","fillerino-js-test","Text Javascript Injection"]
+ * @swagger
+ * /autocomplete:
+ *   get:
+ *     tags:
+ *       - 'Lighthouse API'
+ *     description: The autocomplete API.
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: s
+ *         description: The string to be autocompleted.
+ *         in: query
+ *         required: true
+ *         type: string
+ *         example: 'LBRY is'
+ *     responses:
+ *       200:
+ *         description: The search returns all the found matching items.
+ *         schema:
+ *          type: array
+ *          items:
+ *            $ref: '#/definitions/AutocompleteItem'
  */
 router.get('/autocomplete', LighthouseControllers.autoComplete);
 
 /**
- * @api {get} /status Status
- * @apiGroup Search
- * @apiSuccess {Array[]}  array Will contain information about lighthouse.
- * @apiSuccessExample {json} Success
- *    HTTP/1.1 200 OK
- *
- *    {"err": "Not done yet, will be added"}
+ * @swagger
+ * /status:
+ *   get:
+ *     tags:
+ *       - 'Lighthouse API'
+ *     description: Gets the status of lighthouse.
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Returns the current status of lighthouse
+ *         schema:
+ *          type: object
+ *          required:
+ *            - spaceUsed
+ *            - claimsInIndex
+ *            - totSearches
+ *          properties:
+ *            spaceUsed:
+ *              type: string
+ *              description: The amount of space used for the search db.
+ *            claimsInIndex:
+ *              type: integer
+ *              description: The amount of claims in the index.
+ *            totSearches:
+ *              type: integer
+ *              description: The total amount of searches since the start.
  */
 router.get('/status', LighthouseControllers.status);
 

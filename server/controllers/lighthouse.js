@@ -34,122 +34,142 @@ function getResults (input) {
   if (input.from + input.size > 10000) {
     input.from = 10000 - input.size;
   }
-  return eclient.search({
-    index  : 'claims',
-    _source: ['name', 'value', 'claimId'],
-    body   : {
+  // Search is split up into different parts, all search parts goes under this line.
+  let channelSearch;
+  if (input.channel !== undefined) { // If we got a channel argument, lets filter out only that channel
+    channelSearch = {
+      'bool': {
+        'must': {
+          'query_string': {
+            'fields': ['channel'],
+            'query' : `@${input.channel}`,
+          },
+        },
+      },
+    };
+  }
+  const conBoost = { // Controlling claims should get higher placement in search results.
+    'match': {
+      'bid_state': {
+        'query': 'Controlling',
+        'boost': 20,
+      },
+    },
+  };
+  const matPhraseName = { // Match search text as phrase - Name
+    'match_phrase': {
+      'name': {
+        'query': input.s.trim(),
+        'boost': 10,
+      },
+    },
+  };
+  const matTextName = { // Match search text - Name
+    'match': {
+      'name': {
+        'query': input.s.trim(),
+        'boost': 5,
+      },
+    },
+  };
+  const conTermName = { // Contains search term - Name
+    'query_string': {
+      'query' : '*' + input.s.trim() + '*',
+      'fields': [
+        'name',
+      ],
+      'boost': 3,
+    },
+  };
+  const atdSearch = { // ATD search(author, title, desc)
+    'nested': {
+      'path' : 'value',
       'query': {
         'bool': {
           'should': [
-            {
+            { // Contains search term in Author, Title, Description
+              'query_string': {
+                'query' : '*' + input.s.trim() + '*',
+                'fields': [
+                  'value.stream.metadata.author',
+                  'value.stream.metadata.title',
+                  'value.stream.metadata.description',
+                ],
+                'boost': 1,
+              },
+            },
+            { // Match search term - Author
               'match': {
-                'bid_state': {
-                  // Controlling claims should get higher placement in search results.
-                  'query': 'Controlling',
-                  'boost': 20,
+                'value.stream.metadata.author': {
+                  'query': input.s.trim(),
+                  'boost': 2,
+                },
+              },
+            },
+            { // Match search text as phrase - Author
+              'match_phrase': {
+                'value.stream.metadata.author': {
+                  'query': input.s.trim(),
+                  'boost': 3,
+                },
+              },
+            },
+            { // Match search term - Title
+              'match': {
+                'value.stream.metadata.title': {
+                  'query': input.s.trim(),
+                  'boost': 2,
+                },
+              },
+            },
+            { // Match search text as phrase - Title
+              'match_phrase': {
+                'value.stream.metadata.title': {
+                  'query': input.s.trim(),
+                  'boost': 3,
+                },
+              },
+            },
+            { // Match search term - Description
+              'match': {
+                'value.stream.metadata.description': {
+                  'query': input.s.trim(),
+                  'boost': 2,
+                },
+              },
+            },
+            { // Match search text as phrase - Description
+              'match_phrase': {
+                'value.stream.metadata.description': {
+                  'query': input.s.trim(),
+                  'boost': 3,
                 },
               },
             },
           ],
+        },
+      },
+    },
+  };
+  // End of search parts
+  return eclient.search({
+    index  : 'claims',
+    _source: ['name', 'channel', 'value', 'claimId'],
+    body   : {
+      'query': {
+        'bool': {
+          'should': [
+            conBoost,
+          ],
           'must': [
+            channelSearch,
             {
               'bool': {
                 'should': [
-                  { // Match search text as phrase - Name
-                    'match_phrase': {
-                      'name': {
-                        'query': input.s.trim(),
-                        'boost': 10,
-                      },
-                    },
-                  },
-                  { // Match search text - Name
-                    'match': {
-                      'name': {
-                        'query': input.s.trim(),
-                        'boost': 5,
-                      },
-                    },
-                  },
-                  { // Contains search term - Name
-                    'query_string': {
-                      'query' : '*' + input.s.trim() + '*',
-                      'fields': [
-                        'name',
-                      ],
-                      'boost': 3,
-                    },
-                  },
-                  {
-                    'nested': {
-                      'path' : 'value',
-                      'query': {
-                        'bool': {
-                          'should': [
-                            { // Contains search term in Author, Title, Description
-                              'query_string': {
-                                'query' : '*' + input.s.trim() + '*',
-                                'fields': [
-                                  'value.stream.metadata.author',
-                                  'value.stream.metadata.title',
-                                  'value.stream.metadata.description',
-                                ],
-                                'boost': 1,
-                              },
-                            },
-                            { // Match search term - Author
-                              'match': {
-                                'value.stream.metadata.author': {
-                                  'query': input.s.trim(),
-                                  'boost': 2,
-                                },
-                              },
-                            },
-                            { // Match search text as phrase - Author
-                              'match_phrase': {
-                                'value.stream.metadata.author': {
-                                  'query': input.s.trim(),
-                                  'boost': 3,
-                                },
-                              },
-                            },
-                            { // Match search term - Title
-                              'match': {
-                                'value.stream.metadata.title': {
-                                  'query': input.s.trim(),
-                                  'boost': 2,
-                                },
-                              },
-                            },
-                            { // Match search text as phrase - Title
-                              'match_phrase': {
-                                'value.stream.metadata.title': {
-                                  'query': input.s.trim(),
-                                  'boost': 3,
-                                },
-                              },
-                            },
-                            { // Match search term - Description
-                              'match': {
-                                'value.stream.metadata.description': {
-                                  'query': input.s.trim(),
-                                  'boost': 2,
-                                },
-                              },
-                            },
-                            { // Match search text as phrase - Description
-                              'match_phrase': {
-                                'value.stream.metadata.description': {
-                                  'query': input.s.trim(),
-                                  'boost': 3,
-                                },
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    },
-                  },
+                  matPhraseName,
+                  matTextName,
+                  conTermName,
+                  atdSearch,
                 ],
               },
             },
