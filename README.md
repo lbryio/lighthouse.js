@@ -57,6 +57,10 @@ Contributions to this project are welcome, encouraged, and compensated. For more
 ## License
 This project is MIT Licensed &copy; [LBRYio, Filip Nyquist](https://github.com/lbryio)
 
+## Security
+
+We take security seriously. Please contact security@lbry.io regarding any security issues. Our PGP key is [here](https://keybase.io/lbry/key.asc) if you need it.
+
 ## Contact
 
 The primary contact for this project is [@filipnyquist](https://github.com/filipnyquist) (filip@lbry.io)
