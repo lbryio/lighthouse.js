@@ -166,7 +166,7 @@ function getClaimsSince (time) {
       // `vout ` +
       `FROM claim c ` +
       `LEFT JOIN claim p on p.claim_id = c.publisher_id ` +
-      `WHERE c.modified >='` + time + `'`;
+      `WHERE c.modified_at >='` + time + `'`;
     // Outputs full query to console for copy/paste into chainquery (debugging)
     // console.log(query);
     rp(`https://chainquery.lbry.io/api/sql?query=` + query)
