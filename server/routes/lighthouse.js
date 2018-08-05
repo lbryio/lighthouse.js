@@ -10,78 +10,95 @@ const router = new Router();
 router.get('/', LighthouseControllers.info);
 
 /**
- * @api {get} /search Main Search API
- * @apiGroup Search
- * @apiParam {String} s The search text (Required)
- * @apiParam {Integer} size Amount of results to return as max
- * @apiParam {Integer} from The number to start from, good for pagination.
- * @apiParamExample {url} Example
- *    http://localhost/search?s=fillerino
- * @apiSuccess {Array[]}  array List of search response, each containing the value below.
- * @apiSuccess {Object[]}  result A search result
- * @apiSuccess {String}   result.name The name of the claim.
- * @apiSuccess {String}   result.claimId The claimId of the claim.
- * @apiSuccess {Object[]}   result.value The decoded value of the metadata
- * @apiSuccessExample {json} Success
- *    HTTP/1.1 200 OK
-[
-  {
-    "name":"fillerino-js-test",
-    "claimId":"7bfed722c678a0e0ceb9fb90974bfcc65f528813",
-    "value":{
-      "version":"_0_0_1",
-      "claimType":"streamType",
-      "stream":{
-        "source":{
-          "source":"7ded8c9c7527fce26ced886adcd2eab9fc424c0126eff6572f0615ab66ec3bfbdbbfc1603d95cecd81c9b93fa8ecfbf8",
-          "version":"_0_0_1",
-          "contentType":"text/html",
-          "sourceType":"lbry_sd_hash"
-        },
-        "version":"_0_0_1",
-        "metadata":{
-          "license":"Public Domain",
-          "description":"A test file which tries to communicate with the daemon(from inside the app).",
-          "language":"en",
-          "title":"Text Javascript Injection",
-          "author":"",
-          "version":"_0_1_0",
-          "nsfw":false,
-          "licenseUrl":"",
-          "preview":"",
-          "thumbnail":""
-        }
-      }
-    }
-  },
-  {...},
-  {...}
-]
+ * @oas [get] /search
+ * description: "Returns all the searches matching the search query."
+ * tags:
+ *  - Search API
+ * parameters:
+ *   - (query) s* {String} The search text
+ *   - (query) channel {String} The channel to search, if none, will return all search results
+ *   - (query) size {Integer} The amount of results to return at max
+ *   - (query) from {Integer} The number to start from, good for pagination
+ * responses:
+ *   200:
+ *     description: The search API returns an array of the found matching search items.
+ *     content:
+ *        application/json:
+ *          schema:
+ *            type: array
+ *            items:
+ *              type: object
+ *              required:
+ *                - name
+ *                - claimId
+ *              properties:
+ *                name:
+ *                  type: integer
+ *                  description: The name of the claim.
+ *                  example: "LBRY"
+ *                claimId:
+ *                  type: string
+ *                  description: The claimId of the claim.
+ *                  example: "3db81c073f82fd1bb670c65f526faea3b8546720"
+ *                value:
+ *                  type: object
+ *                  description: Here is the decoded claimdata/metadata from the claim in an object.
+ *
  */
 router.get('/search', LighthouseControllers.search);
 
 /**
- * @api {get} /autocomplete Autocomplete API
- * @apiGroup Search
- * @apiParam {String} s The text to be autocompleted (Required).
- * @apiParamExample {url} Example
- *    http://localhost/autocomplete?s=fillerino
- * @apiSuccess {Array[]}  array List of search response, each containing the value below.
- * @apiSuccessExample {json} Success
- *    HTTP/1.1 200 OK
+ * @oas [get] /autocomplete
+ * tags:
+ *  - Autocomplete API
+ * description: "Returns an array of autocompleted strings."
+ * parameters:
+ *   - (query) s* {String} The string to be autocompleted.
+ * responses:
+ *   200:
+ *     description: The autocomplete API returns an array of the found matching autocompleted strings.
+ *     content:
+ *        application/json:
+ *          schema:
+ *            type: array
+ *            items:
+ *              type: string
+ *              description: A autocompleted string
+ *              example: "lbryisawesome"
  *
- *    ["@Fillerino","fillerino-js-test","Text Javascript Injection"]
  */
 router.get('/autocomplete', LighthouseControllers.autoComplete);
 
 /**
- * @api {get} /status Status
- * @apiGroup Search
- * @apiSuccess {Array[]}  array Will contain information about lighthouse.
- * @apiSuccessExample {json} Success
- *    HTTP/1.1 200 OK
+ * @oas [get] /status
+ * tags:
+ *  - Status API
+ * description: "Returns the current status of the lighthouse instance."
+ * responses:
+ *   200:
+ *     description: Returns the current status of the lighthouse instance.
+ *     content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            required:
+ *              - spaceUsed
+ *              - claimsInIndex
+ *              - totSearches
+ *            properties:
+ *              spaceUsed:
+ *                type: string
+ *                description: The size of the elasticsearch database.
+ *                example: "632.3MB"
+ *              claimsInIndex:
+ *                type: integer
+ *                description: The amount of claims in the search index.
+ *                example: 97615085
+ *              totSearches:
+ *                type: integer
+ *                description: The amount of searches since the start of the lighthouse instance.
+ *                example: 100000
  *
- *    {"err": "Not done yet, will be added"}
  */
 router.get('/status', LighthouseControllers.status);
 
