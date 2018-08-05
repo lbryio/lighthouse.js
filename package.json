@@ -30,7 +30,9 @@
     "test": "npm run lint && npm run mocha",
     "prod": "npm run build && node dist/",
     "mocha": "./node_modules/.bin/mocha --compilers js:babel-register --require babel-polyfill",
-    "gendoc": "apidoc -i server/ -o docs/"
+    "genswagger": "./node_modules/.bin/oas generate swagger.json > ./docs/swagger.json",
+    "genapidocs": "./node_modules/.bin/redoc-cli bundle ./docs/swagger.json -o ./docs/index.html",
+    "gendocs": "npm run genswagger && npm run genapidocs"
   },
   "dependencies": {
     "@koa/cors": "^2.2.1",
@@ -52,9 +54,11 @@
     "koa-logger": "^2.0.0",
     "koa-router": "^7.0.0",
     "limited-request-queue": "^3.0.4",
+    "oas": "^0.8.8",
     "ora": "^1.3.0",
     "prettysize": "^1.1.0",
     "properties-reader": "^0.0.16",
+    "redoc-cli": "^0.6.1",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
     "winston": "^2.3.1",
