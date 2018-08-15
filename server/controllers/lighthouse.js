@@ -42,7 +42,7 @@ function getResults (input) {
         'must': {
           'query_string': {
             'fields': ['channel'],
-            'query' : input.channel,
+            'query' : getEscapedQuery(input.channel),
           },
         },
       },
@@ -74,7 +74,7 @@ function getResults (input) {
   };
   const conTermName = { // Contains search term - Name
     'query_string': {
-      'query' : '*' + input.s.trim() + '*',
+      'query' : '*' + getEscapedQuery(input.s) + '*',
       'fields': [
         'name',
       ],
@@ -89,7 +89,7 @@ function getResults (input) {
           'should': [
             { // Contains search term in Author, Title, Description
               'query_string': {
-                'query' : '*' + input.s.trim() + '*',
+                'query' : '*' + getEscapedQuery(input.s) + '*',
                 'fields': [
                   'value.stream.metadata.author',
                   'value.stream.metadata.title',
@@ -250,6 +250,28 @@ function getStatus () {
         reject(err);
       });
   });
+}
+
+function getEscapedQuery (query) {
+  let badCharacters  = ['+', '-', '&&', '||', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '\\'];
+  let escapedQuery = '';
+  for (var i = 0; i < query.length; i++) {
+    let char1 = query.charAt(i);
+    if (badCharacters.includes(char1)) {
+      escapedQuery = escapedQuery + '\\' + char1;
+    } else if (i + 1 <= query.length) {
+      let char2 = query.charAt(i + 1);
+      if (badCharacters.includes(char1 + char2)) {
+        escapedQuery = escapedQuery + '\\' + char1 + char2;
+        i++;
+      } else {
+        escapedQuery = escapedQuery + char1;
+      }
+    } else {
+      escapedQuery = escapedQuery + char1;
+    }
+  }
+  return escapedQuery;
 }
 
 class LighthouseControllers {
