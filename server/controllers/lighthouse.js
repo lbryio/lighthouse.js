@@ -64,7 +64,7 @@ function getResults (input) {
         },
       },
     },
-};
+  };
   const matPhraseName = { // Match search text as phrase - Name
     'match_phrase': {
       'name': {
