@@ -56,6 +56,15 @@ function getResults (input) {
       },
     },
   };
+  const funcScore = { // 100 LBC adds 1 point to the score
+    'function_score': {
+      'script_score': {
+        'script': {
+          'source': "0.00000001 * doc['effective_amount'].value",
+        },
+      },
+    },
+};
   const matPhraseName = { // Match search text as phrase - Name
     'match_phrase': {
       'name': {
@@ -160,6 +169,7 @@ function getResults (input) {
         'bool': {
           'should': [
             conBoost,
+            funcScore,
           ],
           'must': [
             channelSearch,
