@@ -163,7 +163,7 @@ function getResults (input) {
   // End of search parts
   return eclient.search({
     index  : 'claims',
-    _source: ['name', 'value', 'claimId'],
+    _source: ['name', 'claimId'],
     body   : {
       'query': {
         'bool': {
