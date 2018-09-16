@@ -263,7 +263,9 @@ function getStatus () {
 }
 
 function getEscapedQuery (query) {
-  let badCharacters  = ['+', '-', '&&', '||', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '\\'];
+  // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_reserved_characters
+  // The reserved characters are: + - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /
+  let badCharacters  = ['+', '-', '=', '&&', '||', '>', '<', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '\\', '/'];
   let escapedQuery = '';
   for (var i = 0; i < query.length; i++) {
     let char1 = query.charAt(i);
