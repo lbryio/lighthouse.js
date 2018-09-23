@@ -42,7 +42,7 @@ function getResults (input) {
         'must': {
           'query_string': {
             'fields': ['channel'],
-            'query' : getEscapedQuery(input.channel),
+            'query' : getEscapedQuery(input.channel.trim()),
           },
         },
       },
@@ -83,7 +83,7 @@ function getResults (input) {
   };
   const conTermName = { // Contains search term - Name
     'query_string': {
-      'query' : '*' + getEscapedQuery(input.s) + '*',
+      'query' : '*' + getEscapedQuery(input.s.trim()) + '*',
       'fields': [
         'name',
       ],
@@ -98,7 +98,7 @@ function getResults (input) {
           'should': [
             { // Contains search term in Author, Title, Description
               'query_string': {
-                'query' : '*' + getEscapedQuery(input.s) + '*',
+                'query' : '*' + getEscapedQuery(input.s.trim()) + '*',
                 'fields': [
                   'value.stream.metadata.author',
                   'value.stream.metadata.title',
