@@ -208,20 +208,41 @@ function getRoutingKey () {
 
 function getAutoCompleteQuery (query) {
   return {
-    multi_match: {
-      query         : query.s.trim(),
-      type          : 'phrase_prefix',
-      slop          : 5,
-      max_expansions: 50,
-      fields        : [
-        'name',
-        'value.stream.metadata.author',
-        'value.stream.metadata.title',
-        'value.stream.metadata.description',
+    bool: {
+      should: [
+        { // Author, Title, Description
+          nested: {
+            path : 'value',
+            query: {
+              multi_match: {
+                query         : query.s.trim(),
+                type          : 'phrase_prefix',
+                slop          : 5,
+                max_expansions: 50,
+                fields        : [
+                  'value.stream.metadata.author^3',
+                  'value.stream.metadata.title^5',
+                  'value.stream.metadata.description^2',
+                ],
+              },
+            },
+          },
+        },
+        { // Name
+          multi_match: {
+            query         : query.s.trim(),
+            type          : 'phrase_prefix',
+            slop          : 5,
+            max_expansions: 50,
+            fields        : [
+              'name^4',
+            ],
+          },
+        },
       ],
     },
   };
-}
+};
 
 function getFilter (query) {
   // this is the best place for putting things like filtering on the type of content
@@ -235,7 +256,7 @@ function getAutoComplete (query) {
     routing           : getRoutingKey(query),
     ignore_unavailable: true, // ignore error when date index does not exist
     body              : {
-      size : query.size || 5,
+      size : query.size || 10,
       from : query.from || 0,
       query: {
         bool: {
@@ -316,10 +337,19 @@ class LighthouseControllers {
       let results = result.hits.hits;
       let cResults = [];
       for (let pResult of results) {
-        cResults.push(pResult._source.name);
+        var name = pResult._source.name;
+        if (name.indexOf(ctx.query.s.trim()) > -1 && name.indexOf('http') === -1) {
+          cResults.push(name);
+        }
         if (pResult._source.value && pResult._source.value.stream !== undefined) {
-          cResults.push(pResult._source.value.stream.metadata.title);
-          cResults.push(pResult._source.value.stream.metadata.author);
+          var title = pResult._source.value.stream.metadata.title;
+          var author = pResult._source.value.stream.metadata.author;
+          if (title.indexOf(ctx.query.s.trim()) > -1 && title.indexOf('http') === -1) {
+            cResults.push(title);
+          }
+          if (author.indexOf(ctx.query.s.trim()) > -1 && author.indexOf('http') === -1) {
+            cResults.push(author);
+          }
         }
       }
 
