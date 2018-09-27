@@ -34,6 +34,10 @@ function getResults (input) {
   if (input.from + input.size > 10000) {
     input.from = 10000 - input.size;
   }
+  let trimmedQuery = input.s.trim();
+  let escapedQuery = getWashedQuery(getEscapedQuery(trimmedQuery));
+  let washedQuery = getWashedQuery(trimmedQuery);
+  let effectiveFactor = '0.0000000001';
   // Search is split up into different parts, all search parts goes under this line.
   let channelSearch;
   if (input.channel !== undefined) { // If we got a channel argument, lets filter out only that channel
@@ -42,7 +46,7 @@ function getResults (input) {
         'must': {
           'query_string': {
             'fields': ['channel'],
-            'query' : getEscapedQuery(input.channel.trim()),
+            'query' : getEscapedQuery(getWashedQuery(input.channel.trim())),
           },
         },
       },
@@ -60,7 +64,7 @@ function getResults (input) {
     'function_score': {
       'script_score': {
         'script': {
-          'source': "0.00000001 * doc['effective_amount'].value",
+          'source': `${effectiveFactor} * doc['effective_amount'].value`,
         },
       },
     },
@@ -68,7 +72,7 @@ function getResults (input) {
   const matPhraseName = { // Match search text as phrase - Name
     'match_phrase': {
       'name': {
-        'query': input.s.trim(),
+        'query': washedQuery,
         'boost': 10,
       },
     },
@@ -76,14 +80,14 @@ function getResults (input) {
   const matTextName = { // Match search text - Name
     'match': {
       'name': {
-        'query': input.s.trim(),
+        'query': washedQuery,
         'boost': 5,
       },
     },
   };
   const conTermName = { // Contains search term - Name
     'query_string': {
-      'query' : '*' + getEscapedQuery(input.s.trim()) + '*',
+      'query' : `*${escapedQuery}*`,
       'fields': [
         'name',
       ],
@@ -98,7 +102,7 @@ function getResults (input) {
           'should': [
             { // Contains search term in Author, Title, Description
               'query_string': {
-                'query' : '*' + getEscapedQuery(input.s.trim()) + '*',
+                'query' : `*${escapedQuery}*`,
                 'fields': [
                   'value.stream.metadata.author',
                   'value.stream.metadata.title',
@@ -110,7 +114,7 @@ function getResults (input) {
             { // Match search term - Author
               'match': {
                 'value.stream.metadata.author': {
-                  'query': input.s.trim(),
+                  'query': washedQuery,
                   'boost': 2,
                 },
               },
@@ -118,7 +122,7 @@ function getResults (input) {
             { // Match search text as phrase - Author
               'match_phrase': {
                 'value.stream.metadata.author': {
-                  'query': input.s.trim(),
+                  'query': washedQuery,
                   'boost': 3,
                 },
               },
@@ -126,7 +130,7 @@ function getResults (input) {
             { // Match search term - Title
               'match': {
                 'value.stream.metadata.title': {
-                  'query': input.s.trim(),
+                  'query': washedQuery,
                   'boost': 2,
                 },
               },
@@ -134,7 +138,7 @@ function getResults (input) {
             { // Match search text as phrase - Title
               'match_phrase': {
                 'value.stream.metadata.title': {
-                  'query': input.s.trim(),
+                  'query': washedQuery,
                   'boost': 3,
                 },
               },
@@ -142,7 +146,7 @@ function getResults (input) {
             { // Match search term - Description
               'match': {
                 'value.stream.metadata.description': {
-                  'query': input.s.trim(),
+                  'query': washedQuery,
                   'boost': 2,
                 },
               },
@@ -150,7 +154,7 @@ function getResults (input) {
             { // Match search text as phrase - Description
               'match_phrase': {
                 'value.stream.metadata.description': {
-                  'query': input.s.trim(),
+                  'query': washedQuery,
                   'boost': 3,
                 },
               },
@@ -281,6 +285,21 @@ function getStatus () {
         reject(err);
       });
   });
+}
+
+function getWashedQuery (query) {
+  // compress multiple white spaces to 1
+  query = query.toLowerCase().replace(/ +/g, ' ');
+  let badWords  = [ 'from', 'with', 'not', 'can', 'all', 'are', 'for', 'but', 'and', 'the' ];
+  let words = query.split(' ');
+  let sentence = [];
+  words.forEach(w => {
+    if (!badWords.includes(w))      { sentence.push(w) }
+  });
+  query = sentence.join(' ');
+
+  // remove all words < 3 in length
+  return query.replace(/(\b(\w{1,2})\b(\s|$))/g, '');
 }
 
 function getEscapedQuery (query) {
