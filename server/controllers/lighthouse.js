@@ -184,7 +184,7 @@ function getResults (input) {
               },
             },
           ],
-          'filter': getFilters(input)
+          'filter': getFilters(input),
         },
       },
       size: input.size,
@@ -225,29 +225,29 @@ function getAutoCompleteQuery (query) {
 }
 
 function getFilters (input) {
-    // this is the best place for putting things like filtering on the type of content
-    // Perhaps we can add search param that will filter on how people have categorized / tagged their content
-    var filters = [];
-    if(input.nsfw === "true" || input.nsfw === "false") {
-        const nsfwFilter = {"match": {"value.stream.metadata.nsfw": input.nsfw}}
-        filters.push(nsfwFilter);
-    }
-    if(filters.length > 0) {
-        const filterQuery = {
-                "nested": {
-                    "path": "value",
-                    "query": {
-                        "bool": {
-                            "must": filters
-                        }
-                    }
-                }
-        };
-        return filterQuery;
-    }
-    else {
-        return [];
-    }
+  // this is the best place for putting things like filtering on the type of content
+  // Perhaps we can add search param that will filter on how people have categorized / tagged their content
+  var filters = [];
+  if (input.nsfw === 'true' || input.nsfw === 'false') {
+    const nsfwFilter = {'match': {'value.stream.metadata.nsfw': input.nsfw}};
+    filters.push(nsfwFilter);
+  }
+  if (filters.length > 0) {
+    const filterQuery = {
+      'nested': {
+        'path': 'value',
+        'query': {
+          'bool': {
+            'must': filters,
+          }
+        }
+      }
+    };
+    return filterQuery;
+  }
+  else {
+    return [];
+  }
 }
 
 function getAutoComplete (query) {
