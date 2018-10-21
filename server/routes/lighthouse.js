@@ -19,6 +19,7 @@ router.get('/', LighthouseControllers.info);
  *   - (query) channel {String} The channel to search, if none, will return all search results
  *   - (query) size {Integer} The amount of results to return at max
  *   - (query) from {Integer} The number to start from, good for pagination
+ *   - (query) nsfw {Boolean} If search should return nsfw content or not.
  * responses:
  *   200:
  *     description: The search API returns an array of the found matching search items.
