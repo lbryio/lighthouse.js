@@ -235,17 +235,16 @@ function getFilters (input) {
   if (filters.length > 0) {
     const filterQuery = {
       'nested': {
-        'path': 'value',
+        'path' : 'value',
         'query': {
           'bool': {
             'must': filters,
-          }
-        }
-      }
+          },
+        },
+      },
     };
     return filterQuery;
-  }
-  else {
+  }  else {
     return [];
   }
 }
@@ -261,7 +260,7 @@ function getAutoComplete (query) {
       query: {
         bool: {
           must  : getAutoCompleteQuery(query),
-          filter: getFilter(query),
+          filter: getFilters(query),
         },
       },
     },
