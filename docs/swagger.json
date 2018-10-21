@@ -60,6 +60,14 @@
             "schema": {
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "nsfw",
+            "description": "If search should return nsfw content or not.",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
