@@ -255,13 +255,36 @@ function getAutoCompleteQuery (query) {
 };
 
 function getFilters (input) {
-  // this is the best place for putting things like filtering on the type of content
-  // Perhaps we can add search param that will filter on how people have categorized / tagged their content
   var filters = [];
   var bidStateFilter = {'bool': {'must_not': {'match': { 'bid_state': 'Accepted' }}}};
   if (input.nsfw === 'true' || input.nsfw === 'false') {
     const nsfwFilter = {'match': {'value.stream.metadata.nsfw': input.nsfw}};
     filters.push(nsfwFilter);
+  }
+  if (input.contentType !== undefined) {
+    const contentFilter = {'match_phrase': {'value.stream.source.contentType': getEscapedQuery(input.contentType)}};
+    filters.push(contentFilter);
+  }
+  if (input.mediaType !== undefined) {
+    const mediaTypes = ['audio', 'video', 'text', 'application', 'image'];
+    if (mediaTypes.includes(input.mediaType)) {
+      const mediaFilter = {'match_phrase_prefix': {'value.stream.source.contentType': input.mediaType + '\\/'}};
+      filters.push(mediaFilter);
+    } else if (input.mediaType === 'cad') {
+      const cadTypes = ['SKP', 'simplify3d_stl'];
+      const cadFilter = {'terms': {'value.stream.source.contentType': cadTypes}};
+      filters.push(cadFilter);
+    }
+  }
+  if (input.claimType === 'channel' || input.claimType === 'file') {
+    var query = '';
+    if (input.claimType === 'channel') {
+      query = 'certificateType';
+    } else if (input.claimType === 'file') {
+      query = 'streamType';
+    }
+    const claimTypeFilter = {'match': {'value.claimType': query}};
+    filters.push(claimTypeFilter);
   }
   if (filters.length > 0) {
     const filterQuery = [
