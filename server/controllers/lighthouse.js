@@ -255,13 +255,48 @@ function getAutoCompleteQuery (query) {
 };
 
 function getFilters (input) {
-  // this is the best place for putting things like filtering on the type of content
-  // Perhaps we can add search param that will filter on how people have categorized / tagged their content
   var filters = [];
   var bidStateFilter = {'bool': {'must_not': {'match': { 'bid_state': 'Accepted' }}}};
   if (input.nsfw === 'true' || input.nsfw === 'false') {
     const nsfwFilter = {'match': {'value.stream.metadata.nsfw': input.nsfw}};
     filters.push(nsfwFilter);
+  }
+  if (input.contentType !== undefined) {
+    const contentTypes = input.contentType.split(',');
+    const contentFilter = {'terms': {'value.stream.source.contentType.keyword': contentTypes}};
+    filters.push(contentFilter);
+  }
+  if (input.mediaType !== undefined) {
+    const mediaTypes = input.mediaType.split(',');
+    const possibleTypes = ['audio', 'video', 'text', 'application', 'image'];
+    const shouldQueries = [];
+    for (var i = 0; i < mediaTypes.length; i++) {
+      if (possibleTypes.includes(mediaTypes[i])) {
+        const mediaFilter = {'prefix': {'value.stream.source.contentType.keyword': mediaTypes[i] + '/'}};
+        shouldQueries.push(mediaFilter);
+      } else if (mediaTypes[i] === 'cad') {
+        const cadTypes = ['SKP', 'simplify3d_stl'];
+        const cadFilter = {'terms': {'value.stream.source.contentType.keyword': cadTypes}};
+        shouldQueries.push(cadFilter);
+      }
+    }
+    if (shouldQueries.length === 0) {
+      const noneFilter = {'match_none': {}};
+      filters.push(noneFilter);
+    } else {
+      const mediaTypeFilter = {'bool': {'should': shouldQueries}};
+      filters.push(mediaTypeFilter);
+    }
+  }
+  if (input.claimType === 'channel' || input.claimType === 'file') {
+    var query = '';
+    if (input.claimType === 'channel') {
+      query = 'certificateType';
+    } else if (input.claimType === 'file') {
+      query = 'streamType';
+    }
+    const claimTypeFilter = {'match': {'value.claimType': query}};
+    filters.push(claimTypeFilter);
   }
   if (filters.length > 0) {
     const filterQuery = [

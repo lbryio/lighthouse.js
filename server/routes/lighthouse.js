@@ -20,6 +20,9 @@ router.get('/', LighthouseControllers.info);
  *   - (query) size {Integer} The amount of results to return at max
  *   - (query) from {Integer} The number to start from, good for pagination
  *   - (query) nsfw {Boolean} If search should return nsfw content or not.
+ *   - (query) contentType {String} Filter by MIME type.
+ *   - (query) mediaType {String} Filter by media type, can be audio, video, image, application, text or cad.
+ *   - (query) claimType {String} Return channels or files only, value can be 'channel' or 'file'.
  * responses:
  *   200:
  *     description: The search API returns an array of the found matching search items.
