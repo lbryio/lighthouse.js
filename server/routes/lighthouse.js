@@ -103,4 +103,17 @@ router.get('/autocomplete', LighthouseControllers.autoComplete);
  */
 router.get('/status', LighthouseControllers.status);
 
+/**
+ * @oas [get] /autoupdate
+ * tags:
+ *  - Auto Update API
+ * description: "Checks signature of travis webhook and calls deploy script to get the latest master branch to deploy."
+ * responses:
+ *   200:
+ *     description: Successful if script called.
+ *
+ */
+
+router.post('/autoupdate', LighthouseControllers.autoUpdate);
+
 export default router;
