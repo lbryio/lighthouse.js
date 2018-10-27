@@ -1,6 +1,7 @@
 # Lighthouse - A lightning fast search for the LBRY blockchain
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c73f0c5eba1f4389894d0a0fdd31486f)](https://app.codacy.com/app/fillerix/lighthouse?utm_source=github.com&utm_medium=referral&utm_content=lbryio/lighthouse&utm_campaign=badger)
+[![MIT licensed](https://img.shields.io/dub/l/vibe-d.svg?style=flat)](https://github.com/lbryio/lighthouse/blob/master/LICENSE)
 
 Lighthouse is a lightning-fast advanced search engine API for publications on the lbrycrd with autocomplete capabilities.
 The official lighthouse instance is live at https://lighthouse.lbry.io
