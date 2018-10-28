@@ -3,4 +3,4 @@ node_js:
  - "node"
 notifications:
   email: false
-  webhooks: https://lhdev.lbry.tech/autoupdate
+  webhooks: https://lighthouse.lbry.io/autoupdate

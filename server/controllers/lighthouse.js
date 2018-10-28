@@ -8,6 +8,7 @@ import {claimSync} from '../utils/chainquery';
 import {getStats} from '../utils/importer';
 import crypto from 'crypto';
 import got from 'got';
+import {logToSlack} from '../index';
 
 const loggerStream = winstonStream(winston, 'info');
 
@@ -441,22 +442,22 @@ class LighthouseControllers {
     let status = verifier.verify(travisPublicKey, travisSignature);
     if (status) {
       let notification = JSON.parse(payload);
-      if (notification.branch === 'auto_deploy_api') {
+      if (notification.branch === 'master') {
         if (!notification.isPullRequest) {
-          console.log('Auto Updating Lighthouse - ', notification.message);
+          logToSlack('Auto Updating Lighthouse - ' + notification.message);
           update();
           ctx.body = 'OK';
         } else {
           ctx.status = 400;
-          ctx.body = 'skip auto update: pull request';
+          ctx.body = 'skip auto update: pull request'; logToSlack(ctx.body);
         }
       } else {
         ctx.status = 400;
-        ctx.body = 'only deploys on master branch';
+        ctx.body = 'skip auto update: only deploys on master branch'; logToSlack(ctx.body);
       }
     } else {
       ctx.status = 500;
-      ctx.body = 'could not verify webhook';
+      ctx.body = 'skip auto update: could not verify webhook'; logToSlack(ctx.body);
     }
   }
 
