@@ -17,9 +17,9 @@ The official lighthouse instance is live at https://lighthouse.lbry.io
 
 ## Installation
 ### Prerequisites
-* Node v8
-* Yarn 
-* Python2.7
+* [Node v8](https://nodejs.org/en/download/)
+* [Yarn](https://yarnpkg.com/en/docs/install)
+* [Python 2.7](https://www.python.org/downloads/)
 * [Elasticsearch](https://www.elastic.co/downloads/elasticsearch)
 
 
