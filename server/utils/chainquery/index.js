@@ -12,6 +12,7 @@ import appRoot from 'app-root-path';
 import fs from 'fs';
 import fileExists from 'file-exists';
 import * as util from '../../utils/importer/util';
+import {logErrorToSlack} from '../../index';
 
 const elasticsearchloglevel = 'info';
 const loggerStream = winstonStream(winston, elasticsearchloglevel);
@@ -68,7 +69,7 @@ export async function claimSync () {
     await sleep(600000);
     claimSync();
   } catch (err) {
-    winston.log(err);
+    logErrorToSlack(err);
     status.err = err;
     await sleep(600000);
     claimSync();
@@ -116,6 +117,7 @@ function getJSON (path) {
   return new Promise((resolve, reject) => {
     jsonfile.readFile(path, function (err, jsoncontent) {
       if (err) {
+        logErrorToSlack(err);
         reject(err);
       } else {
         resolve(jsoncontent);
@@ -127,6 +129,7 @@ function saveJSON (path, obj) {
   return new Promise((resolve, reject) => {
     jsonfile.writeFile(path, obj, function (err, jsoncontent) {
       if (err) {
+        logErrorToSlack(err);
         reject(err);
       } else {
         resolve();
@@ -146,7 +149,7 @@ function getBlockedOutpoints () {
         resolve(htmlString);
       })
       .catch(function (err) {
-        winston.log('error', '[Importer] Error getting blocked outpoints. ' + err);
+        logErrorToSlack('[Importer] Error getting blocked outpoints. ' + err);
         reject(err);
       });
   });
@@ -174,7 +177,7 @@ function getClaimsSince (time) {
         resolve(htmlString);
       })
       .catch(function (err) {
-        winston.log('error', '[Importer] Error getting updated claims. ' + err);
+        logErrorToSlack('[Importer] Error getting updated claims. ' + err);
         reject(err);
       });
   });

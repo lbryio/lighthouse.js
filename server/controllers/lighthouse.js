@@ -6,6 +6,9 @@ import rp from 'request-promise';
 import pretty from 'prettysize';
 import {claimSync} from '../utils/chainquery';
 import {getStats} from '../utils/importer';
+import crypto from 'crypto';
+import got from 'got';
+import {logToSlack} from '../index';
 
 const loggerStream = winstonStream(winston, 'info');
 
@@ -346,6 +349,11 @@ function getEscapedQuery (query) {
   return escapedQuery;
 }
 
+async function update () {
+  const shell = require('shelljs');
+  shell.exec('cd ~ && ./update.sh');
+}
+
 class LighthouseControllers {
   /* eslint-disable no-param-reassign */
   // Start syncing blocks...
@@ -418,6 +426,39 @@ class LighthouseControllers {
    */
   async status (ctx) {
     ctx.body = await getStatus();
+  }
+
+  /**
+   * AutoUpdate updates the application from the master branch.
+   * @param {ctx} Koa Context
+   */
+  async autoUpdate (ctx) {
+    let travisSignature = Buffer.from(ctx.request.headers.signature, 'base64');
+    let payload = ctx.request.body.payload;
+    let travisResponse  = await got('https://api.travis-ci.com/config', {timeout: 10000});
+    let travisPublicKey = JSON.parse(travisResponse.body).config.notifications.webhook.public_key;
+    let verifier = crypto.createVerify('sha1');
+    verifier.update(payload);
+    let status = verifier.verify(travisPublicKey, travisSignature);
+    if (status) {
+      let notification = JSON.parse(payload);
+      if (notification.branch === 'master') {
+        if (!notification.isPullRequest) {
+          logToSlack('Auto Updating Lighthouse - ' + notification.message);
+          update();
+          ctx.body = 'OK';
+        } else {
+          ctx.status = 400;
+          ctx.body = 'skip auto update: pull request'; logToSlack(ctx.body);
+        }
+      } else {
+        ctx.status = 400;
+        ctx.body = 'skip auto update: only deploys on master branch'; logToSlack(ctx.body);
+      }
+    } else {
+      ctx.status = 500;
+      ctx.body = 'skip auto update: could not verify webhook'; logToSlack(ctx.body);
+    }
   }
 
   /* eslint-enable no-param-reassign */
