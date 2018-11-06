@@ -168,7 +168,7 @@ function getResults (input) {
     },
   };
   // End of search parts
-  return eclient.search({
+  let esQuery = {
     index  : 'claims',
     _source: ['name', 'value', 'claimId'],
     body   : {
@@ -200,7 +200,9 @@ function getResults (input) {
         _score: 'desc',
       },
     },
-  });
+  };
+  // console.log('QUERY: ', esQuery);
+  return eclient.search(esQuery);
 }
 
 function getIndex () {
@@ -256,24 +258,27 @@ function getFilters (input) {
   // this is the best place for putting things like filtering on the type of content
   // Perhaps we can add search param that will filter on how people have categorized / tagged their content
   var filters = [];
+  var bidStateFilter = {'bool': {'must_not': {'match': { 'bid_state': 'Accepted' }}}};
   if (input.nsfw === 'true' || input.nsfw === 'false') {
     const nsfwFilter = {'match': {'value.stream.metadata.nsfw': input.nsfw}};
     filters.push(nsfwFilter);
   }
   if (filters.length > 0) {
-    const filterQuery = {
-      'nested': {
-        'path' : 'value',
-        'query': {
-          'bool': {
-            'must': filters,
+    const filterQuery = [
+      {
+        'nested': {
+          'path' : 'value',
+          'query': {
+            'bool': {
+              'must': filters,
+            },
           },
         },
       },
-    };
+      bidStateFilter];
     return filterQuery;
   }  else {
-    return [];
+    return [bidStateFilter];
   }
 }
 
