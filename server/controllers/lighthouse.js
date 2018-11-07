@@ -327,7 +327,7 @@ function getWashedQuery (query) {
   query = sentence.join(' ');
 
   // remove all words < 3 in length
-  return query.replace(/(\b(\w{1,2})\b(\s|$))/g, '');
+  return query.replace(/((\s|^)\b(\w{1,2})\b)/g, '').trim();
 }
 
 function getEscapedQuery (query) {
