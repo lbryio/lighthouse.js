@@ -448,7 +448,7 @@ class LighthouseControllers {
     if (status) {
       let notification = JSON.parse(payload);
       if (notification.branch === 'master') {
-        if (!notification.isPullRequest) {
+        if (!notification.pull_request) {
           logToSlack('Auto Updating Lighthouse - ' + notification.message);
           update();
           ctx.body = 'OK';
