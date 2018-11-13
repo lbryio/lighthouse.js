@@ -317,7 +317,7 @@ function getStatus () {
 
 function getWashedQuery (query) {
   // compress multiple white spaces to 1
-  query = query.toLowerCase().replace(/ +/g, ' ');
+  query = query.toLowerCase().replace(/ +/g, ' ').replace('lbry://', '');
   let splitBy = ['&', '$', ' '];
   let regex = new RegExp(splitBy.join('|'), 'gi');
   let badWords  = [ 'from', 'with', 'not', 'can', 'all', 'are', 'for', 'but', 'and', 'the' ];
