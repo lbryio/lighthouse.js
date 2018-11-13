@@ -318,8 +318,10 @@ function getStatus () {
 function getWashedQuery (query) {
   // compress multiple white spaces to 1
   query = query.toLowerCase().replace(/ +/g, ' ');
+  let splitBy = ['&', '$', ' '];
+  let regex = new RegExp(splitBy.join('|'), 'gi');
   let badWords  = [ 'from', 'with', 'not', 'can', 'all', 'are', 'for', 'but', 'and', 'the' ];
-  let words = query.split(' ');
+  let words = query.split(regex);
   let sentence = [];
   words.forEach(w => {
     if (!badWords.includes(w))      { sentence.push(w) }
