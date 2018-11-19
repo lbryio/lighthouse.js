@@ -40,7 +40,7 @@ function getResults (input) {
   let trimmedQuery = input.s.trim();
   let escapedQuery = getWashedQuery(getEscapedQuery(trimmedQuery));
   let washedQuery = getWashedQuery(trimmedQuery);
-  let effectiveFactor = '0.0000000001';
+  let effectiveFactor = '0.00000000001';
   // Search is split up into different parts, all search parts goes under this line.
   let channelSearch;
   if (input.channel !== undefined) { // If we got a channel argument, lets filter out only that channel
@@ -317,9 +317,11 @@ function getStatus () {
 
 function getWashedQuery (query) {
   // compress multiple white spaces to 1
-  query = query.toLowerCase().replace(/ +/g, ' ');
+  query = query.toLowerCase().replace(/ +/g, ' ').replace('lbry://', '');
+  let splitBy = ['&', '$', ' '];
+  let regex = new RegExp(splitBy.join('|'), 'gi');
   let badWords  = [ 'from', 'with', 'not', 'can', 'all', 'are', 'for', 'but', 'and', 'the' ];
-  let words = query.split(' ');
+  let words = query.split(regex);
   let sentence = [];
   words.forEach(w => {
     if (!badWords.includes(w))      { sentence.push(w) }
