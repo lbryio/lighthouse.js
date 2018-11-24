@@ -262,18 +262,22 @@ function getFilters (input) {
     filters.push(nsfwFilter);
   }
   if (input.contentType !== undefined) {
-    const contentFilter = {'match_phrase': {'value.stream.source.contentType': getEscapedQuery(input.contentType)}};
+    const contentFilter = {'term': {'value.stream.source.contentType.keyword': input.contentType}};
     filters.push(contentFilter);
   }
   if (input.mediaType !== undefined) {
     const mediaTypes = ['audio', 'video', 'text', 'application', 'image'];
     if (mediaTypes.includes(input.mediaType)) {
-      const mediaFilter = {'match_phrase_prefix': {'value.stream.source.contentType': input.mediaType + '\\/'}};
+      const mediaFilter = {'prefix': {'value.stream.source.contentType.keyword': input.mediaType + '/'}};
       filters.push(mediaFilter);
     } else if (input.mediaType === 'cad') {
       const cadTypes = ['SKP', 'simplify3d_stl'];
-      const cadFilter = {'terms': {'value.stream.source.contentType': cadTypes}};
+      const cadFilter = {'terms': {'value.stream.source.contentType.keyword': cadTypes}};
       filters.push(cadFilter);
+    }
+    else { // If mediaType is not in the list, return no results
+      const noneFilter = {'match_none': {}};
+      filters.push(noneFilter);
     }
   }
   if (input.claimType === 'channel' || input.claimType === 'file') {
