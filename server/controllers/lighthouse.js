@@ -274,8 +274,7 @@ function getFilters (input) {
       const cadTypes = ['SKP', 'simplify3d_stl'];
       const cadFilter = {'terms': {'value.stream.source.contentType.keyword': cadTypes}};
       filters.push(cadFilter);
-    }
-    else { // If mediaType is not in the list, return no results
+    } else { // If mediaType is not in the list, return no results
       const noneFilter = {'match_none': {}};
       filters.push(noneFilter);
     }
