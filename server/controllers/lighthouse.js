@@ -262,12 +262,12 @@ function getFilters (input) {
     filters.push(nsfwFilter);
   }
   if (input.contentType !== undefined) {
-    const contentTypes = input.contentType.split(",");
+    const contentTypes = input.contentType.split(',');
     const contentFilter = {'terms': {'value.stream.source.contentType.keyword': contentTypes}};
     filters.push(contentFilter);
   }
   if (input.mediaType !== undefined) {
-    const mediaTypes = input.mediaType.split(",");
+    const mediaTypes = input.mediaType.split(',');
     const possibleTypes = ['audio', 'video', 'text', 'application', 'image'];
     const shouldQueries = [];
     for (var i = 0; i < mediaTypes.length; i++) {
