@@ -161,6 +161,7 @@ function getClaimsSince (time) {
       `SELECT ` +
       `c.name,` +
       `p.name as channel,` +
+      `p.effective_amount as certificate_amount` +
       `c.bid_state,` +
       `c.effective_amount,` +
       `c.claim_id as claimId,` +
