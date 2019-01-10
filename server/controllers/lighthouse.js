@@ -63,11 +63,20 @@ function getResults (input) {
       },
     },
   };
-  const funcScore = { // 100 LBC adds 1 point to the score
+  const funcScoreClaimWeight = { // 100 LBC adds 1 point to the score
     'function_score': {
       'script_score': {
         'script': {
           'source': `${effectiveFactor} * doc['effective_amount'].value`,
+        },
+      },
+    },
+  };
+  const funcScoreChannelWeight = { // 100 LBC adds 1 point to the score
+    'function_score': {
+      'script_score': {
+        'script': {
+          'source': `${effectiveFactor} * doc['certificate_amount'].value`,
         },
       },
     },
@@ -176,7 +185,8 @@ function getResults (input) {
         'bool': {
           'should': [
             conBoost,
-            funcScore,
+            funcScoreClaimWeight,
+            funcScoreChannelWeight,
           ],
           'must': [
             channelSearch,
