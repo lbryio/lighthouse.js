@@ -64,4 +64,4 @@ We take security seriously. Please contact security@lbry.io regarding any securi
 
 ## Contact
 
-The primary contact for this project is [@filipnyquist](https://github.com/filipnyquist) (filip@lbry.io)
+The primary contact for this project is [@tiger5226](https://github.com/tiger5226) (beamer@lbry.io)
