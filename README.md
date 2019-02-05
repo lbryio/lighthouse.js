@@ -11,8 +11,15 @@ The official lighthouse instance is live at https://lighthouse.lbry.io
 1. Elasticsearch as a backend db server.
 2. LBRYimport, an importer that imports the claims into the Elasticsearch database.
 3. Lighthouse API server, which serves the API and does all calculations about what to send to the end user. 
-### API Documentation
-
+### API Documentation / Usage example
+To make a simple search by string:
+```
+https://lighthouse.lbry.io/search?s=stringtosearch
+```
+To get autocomplete suggestions:
+```
+https://lighthouse.lbry.io/autocomplete?s=stringtocomp
+```
 [The full API documentation](https://lbryio.github.io/lighthouse/)
 
 ## Installation
