@@ -11,15 +11,21 @@ The official lighthouse instance is live at https://lighthouse.lbry.io
 1. Elasticsearch as a backend db server.
 2. LBRYimport, an importer that imports the claims into the Elasticsearch database.
 3. Lighthouse API server, which serves the API and does all calculations about what to send to the end user. 
-### API Documentation
-
+### API Documentation / Usage example
+To make a simple search by string:
+```
+https://lighthouse.lbry.io/search?s=stringtosearch
+```
+To get autocomplete suggestions:
+```
+https://lighthouse.lbry.io/autocomplete?s=stringtocomp
+```
 [The full API documentation](https://lbryio.github.io/lighthouse/)
 
 ## Installation
 ### Prerequisites
 * [Node v8](https://nodejs.org/en/download/)
 * [Yarn](https://yarnpkg.com/en/docs/install)
-* [Python 2.7](https://www.python.org/downloads/)
 * [Elasticsearch](https://www.elastic.co/downloads/elasticsearch)
 
 
@@ -27,11 +33,6 @@ The official lighthouse instance is live at https://lighthouse.lbry.io
 ```
 git clone https://github.com/lbryio/lighthouse
 ```
->Grab the latest release of lbrycrd here:
-
-[Download lbrycrd](https://github.com/lbryio/lbrycrd/releases)
->Create a lbrycrd config file at ~/.lbrycrd/lbrycrd.conf which contains rpcuser,rpcpassword and rpcport. Then run lbrycrd in the background with that config file.
-
 >Make sure elasticsearch is running and run (from the lighthouse dir):
 ```
 ./gendb.sh
@@ -39,10 +40,6 @@ git clone https://github.com/lbryio/lighthouse
 >Install dependencies:
 ```
 yarn install --production=false
-```
->Start an instance of the decoder:
-```
-cd decoder && pip install -r requirements.txt && python decoder.py
 ```
 >Build and run Lighthouse:
 ```
