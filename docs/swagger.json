@@ -68,6 +68,30 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "in": "query",
+            "name": "contentType",
+            "description": "Filter by MIME type.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mediaType",
+            "description": "Filter by media type, can be audio, video, image, application, text or cad.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "claimType",
+            "description": "Return channels or files only, value can be 'channel' or 'file'.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
