@@ -65,19 +65,19 @@ function getResults (input) {
   };
   const funcScoreClaimWeight = { // 100 LBC adds 1 point to the score
     'function_score': {
-      'script_score': {
-        'script': {
-          'source': `${effectiveFactor} * doc['effective_amount'].value`,
-        },
+      'field_value_factor': {
+        'field'  : 'effective_amount',
+        'factor' : effectiveFactor,
+        'missing': 1,
       },
     },
   };
   const funcScoreChannelWeight = { // 100 LBC adds 1 point to the score
     'function_score': {
-      'script_score': {
-        'script': {
-          'source': `${effectiveFactor} * doc['certificate_amount'].value`,
-        },
+      'field_value_factor': {
+        'field'  : 'certificate_amount',
+        'factor' : effectiveFactor,
+        'missing': 1,
       },
     },
   };
