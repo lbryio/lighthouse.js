@@ -172,12 +172,14 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
       `p.name as channel,` +
       `c.bid_state,` +
       `c.effective_amount,` +
+      `COALESCE(p.effective_amount,1) as certificate_amount,` +
       `c.claim_id as claimId,` +
       `c.value_as_json as value ` +
       `FROM claim c ` +
       `LEFT JOIN claim p on p.claim_id = c.publisher_id ` +
       `WHERE c.id >` + lastID + ` ` +
       `AND c.modified_at >='` + time + `' ` +
+      `ORDER BY c.id ` +
       `LIMIT ` + MaxClaimsInCall;
     // Outputs full query to console for copy/paste into chainquery (debugging)
     // console.log(query);
