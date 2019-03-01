@@ -81,6 +81,45 @@ function getResults (input) {
       },
     },
   };
+
+  const splitName = () => {
+    let queries = [];
+    console.log(washedQuery);
+    console.log(washedQuery.split(' '));
+    washedQuery.split(' ').forEach((term) => {
+      queries.push({ // Contains search term
+        'query_string': {
+          'query' : `*${term}*`,
+          'fields': [
+            'name',
+          ],
+          'boost': 3,
+        },
+      });
+    });
+    console.log(JSON.stringify(queries));
+    return queries;
+  };
+  const splitATD = () => {
+    let queries = [];
+    console.log(washedQuery);
+    console.log(washedQuery.split(' '));
+    washedQuery.split(' ').forEach((term) => {
+      queries.push({ // Contains search term in Author, Title, Description
+        'query_string': {
+          'query' : `*${term}*`,
+          'fields': [
+            'value.stream.metadata.author',
+            'value.stream.metadata.title',
+            'value.stream.metadata.description',
+          ],
+          'boost': 1,
+        },
+      });
+    });
+    console.log(JSON.stringify(queries));
+    return queries;
+  };
   const matPhraseName = { // Match search text as phrase - Name
     'match_phrase': {
       'name': {
@@ -112,6 +151,7 @@ function getResults (input) {
       'query': {
         'bool': {
           'should': [
+            ...splitATD(),
             { // Contains search term in Author, Title, Description
               'query_string': {
                 'query' : `*${escapedQuery}*`,
@@ -179,7 +219,7 @@ function getResults (input) {
   // End of search parts
   let esQuery = {
     index  : 'claims',
-    _source: ['name', 'value', 'claimId'],
+    _source: ['name', 'claimId'],
     body   : {
       'query': {
         'bool': {
@@ -193,6 +233,7 @@ function getResults (input) {
             {
               'bool': {
                 'should': [
+                  ...splitName(),
                   matPhraseName,
                   matTextName,
                   conTermName,
