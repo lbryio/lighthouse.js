@@ -84,9 +84,7 @@ function getResults (input) {
 
   const splitName = () => {
     let queries = [];
-    console.log(washedQuery);
-    console.log(washedQuery.split(' '));
-    washedQuery.split(' ').forEach((term) => {
+    escapedQuery.split(' ').forEach((term) => {
       queries.push({ // Contains search term
         'query_string': {
           'query' : `*${term}*`,
@@ -97,14 +95,11 @@ function getResults (input) {
         },
       });
     });
-    console.log(JSON.stringify(queries));
     return queries;
   };
   const splitATD = () => {
     let queries = [];
-    console.log(washedQuery);
-    console.log(washedQuery.split(' '));
-    washedQuery.split(' ').forEach((term) => {
+    escapedQuery.split(' ').forEach((term) => {
       queries.push({ // Contains search term in Author, Title, Description
         'query_string': {
           'query' : `*${term}*`,
@@ -117,7 +112,6 @@ function getResults (input) {
         },
       });
     });
-    console.log(JSON.stringify(queries));
     return queries;
   };
   const matPhraseName = { // Match search text as phrase - Name
