@@ -477,7 +477,9 @@ class LighthouseControllers {
         if (name.indexOf(ctx.query.s.trim()) > -1 && name.indexOf('http') === -1) {
           cResults.push(name);
         }
-        if (pResult._source.value && pResult._source.value.stream !== undefined) {
+        if (pResult._source.value &&
+            pResult._source.value.stream &&
+            pResult._source.value.stream !== undefined){
           var title = pResult._source.value.stream.metadata.title;
           var author = pResult._source.value.stream.metadata.author;
           if (title.indexOf(ctx.query.s.trim()) > -1 && title.indexOf('http') === -1) {
