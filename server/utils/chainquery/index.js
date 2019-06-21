@@ -52,19 +52,22 @@ export async function claimSync () {
       let claims = JSON.parse(claimsResponse).data;
       status.info = 'addingClaimsToElastic';
       for (let claim of claims) {
-        claim.value = JSON.parse(claim.value).Claim;
-        if (claim.name && claim.value) {
-          claim.suggest_name = {
-            input : '' + claim.name + '',
-            weight: '30',
-          };
+        const parsedClaim = JSON.parse(claim.value);
+        if (parsedClaim.Claim) {
+          claim.value = JSON.parse(claim.value).Claim;
+          if (claim.name && claim.value) {
+            claim.suggest_name = {
+              input : '' + claim.name + '',
+              weight: '30',
+            };
+          }
+          if (claim.bid_state === 'Spent' || claim.bid_state === 'Expired') {
+            deleteFromElastic(claim.claimId);
+          } else {
+            pushElastic(claim);
+          }
+          lastID = claim.id;
         }
-        if (claim.bid_state === 'Spent' || claim.bid_state === 'Expired') {
-          deleteFromElastic(claim.claimId);
-        } else {
-          pushElastic(claim);
-        }
-        lastID = claim.id;
       }
       winston.log('info', '[Importer] Pushed ' + claims.length + ' claims to elastic search [LastID]' + lastID);
       finished = claims.length < groupSize;
