@@ -52,22 +52,23 @@ export async function claimSync () {
       let claims = JSON.parse(claimsResponse).data;
       status.info = 'addingClaimsToElastic';
       for (let claim of claims) {
-        const parsedClaim = JSON.parse(claim.value);
-        if (parsedClaim.Claim) {
-          claim.value = JSON.parse(claim.value).Claim;
-          if (claim.name && claim.value) {
-            claim.suggest_name = {
-              input : '' + claim.name + '',
-              weight: '30',
-            };
-          }
-          if (claim.bid_state === 'Spent' || claim.bid_state === 'Expired') {
-            deleteFromElastic(claim.claimId);
-          } else {
-            pushElastic(claim);
-          }
-          lastID = claim.id;
+        if (!claim.value) {
+          console.log(claim);
+          await logErrorToSlack('Failed to process claim ' + claim.claimId + ' due to missing value');
         }
+        claim.value = JSON.parse(claim.value).Claim;
+        if (claim.name && claim.value) {
+          claim.suggest_name = {
+            input : '' + claim.name + '',
+            weight: '30',
+          };
+        }
+        if (claim.bid_state === 'Spent' || claim.bid_state === 'Expired') {
+          deleteFromElastic(claim.claimId);
+        } else {
+          pushElastic(claim);
+        }
+        lastID = claim.id;
       }
       winston.log('info', '[Importer] Pushed ' + claims.length + ' claims to elastic search [LastID]' + lastID);
       finished = claims.length < groupSize;
@@ -80,7 +81,7 @@ export async function claimSync () {
     await sleep(600000);
     claimSync();
   } catch (err) {
-    logErrorToSlack(err);
+    await logErrorToSlack(err);
     status.err = err;
     await sleep(600000);
     claimSync();
@@ -185,7 +186,7 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
       `ORDER BY c.id ` +
       `LIMIT ` + MaxClaimsInCall;
     // Outputs full query to console for copy/paste into chainquery (debugging)
-    // console.log(query);
+    console.log(query);
     rp(`https://chainquery.lbry.io/api/sql?query=` + query)
       .then(function (htmlString) {
         resolve(htmlString);
