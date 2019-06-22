@@ -52,7 +52,7 @@ export async function claimSync () {
       let claims = JSON.parse(claimsResponse).data;
       status.info = 'addingClaimsToElastic';
       for (let claim of claims) {
-        if (!claim.value) {
+        if (claim.value === null) {
           console.log(claim);
           await logErrorToSlack('Failed to process claim ' + claim.claimId + ' due to missing value');
         }
