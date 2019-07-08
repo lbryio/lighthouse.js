@@ -211,7 +211,7 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
         logErrorToSlack('[Importer] Error getting updated claims. ' + err);
         return reject(err);
       }
-      resolve(results);
+      resolve(JSON.parse(results));
     });
   });
 }
