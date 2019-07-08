@@ -207,6 +207,7 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
     console.log(query);
     connection.query(query, function (err, results, fields) {
       if (err) {
+        console.error(err);
         logErrorToSlack('[Importer] Error getting updated claims. ' + err);
         return reject(err);
       }

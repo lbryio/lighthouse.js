@@ -12,8 +12,8 @@ require('winston-daily-rotate-file');
 // Setup logging
 winston.remove(winston.transports.Console);
 winston.add(winston.transports.Console, { colorize: true, timestamp: true, prettyPrint: true });
-var slackAPIKey = process.env.SLACK_HOOK_URL;
-var mySlack = new slack(slackAPIKey, {});
+let slackAPIKey = process.env.SLACK_HOOK_URL;
+let mySlack = new slack(slackAPIKey, {});
 // Create Koa Application
 const app = new Koa();
 

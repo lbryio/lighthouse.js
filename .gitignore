@@ -9,3 +9,4 @@ npm-debug.log
 claimTrieCache.json
 syncState.json
 yarn-error.log
+chainquery-config.json
