@@ -59,8 +59,7 @@ export async function claimSync () {
     let lastID = syncState.LastID;
     let iteration = 0;
     while (!finished) {
-      let claimsResponse = await getClaimsSince(syncState.LastSyncTime, lastID, BatchSize);
-      let claims = JSON.parse(claimsResponse).data;
+      let claims = await getClaimsSince(syncState.LastSyncTime, lastID, BatchSize);
       status.info = 'addingClaimsToElastic';
       for (let claim of claims) {
         if (claim.value === null) {
@@ -211,7 +210,21 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
         logErrorToSlack('[Importer] Error getting updated claims. ' + err);
         return reject(err);
       }
-      resolve(JSON.parse(results));
+      let claims = [];
+      for (let i = 0; i < results.length; i++) {
+        let r = results[i];
+        claims.push({
+          id                : r.id,
+          name              : r.name,
+          channel           : r.channel,
+          bid_state         : r.bid_state,
+          effective_amount  : r.effective_amount,
+          certificate_amount: r.certificate_amount,
+          claimId           : r.claimId,
+          value             : r.value,
+        });
+      }
+      resolve(claims);
     });
   });
 }
