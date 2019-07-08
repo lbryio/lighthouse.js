@@ -10,14 +10,14 @@
     },
     "contact": {
       "name": "LBRY Inc",
-      "url": "https://lbry.io",
-      "email": "filip@lbry.io"
+      "url": "https://lbry.com",
+      "email": "filip@lbry.com"
     },
     "description": "Lighthouse is a search engine for the LBRY blockchain based on elasticsearch, chainquery and Node.JS."
   },
   "servers": [
     {
-      "url": "https://lighthouse.lbry.io"
+      "url": "https://lighthouse.lbry.com"
     }
   ],
   "paths": {

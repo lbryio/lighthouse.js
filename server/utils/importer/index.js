@@ -174,7 +174,7 @@ function getRemovedClaims (oldClaimTrie, newClaimTrie) {
 
 function getBlockedOutpoints () {
   return new Promise((resolve, reject) => {
-    rp(`http://api.lbry.io/file/list_blocked`)
+    rp(`http://api.lbry.com/file/list_blocked`)
       .then(function (htmlString) {
         resolve(htmlString);
       })

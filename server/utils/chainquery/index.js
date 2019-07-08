@@ -157,7 +157,7 @@ function sleep (ms) {
 
 function getBlockedOutpoints () {
   return new Promise((resolve, reject) => {
-    rp(`https://api.lbry.io/file/list_blocked`)
+    rp(`https://api.lbry.com/file/list_blocked`)
       .then(function (htmlString) {
         resolve(htmlString);
       })
@@ -188,7 +188,7 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
       `LIMIT ` + MaxClaimsInCall;
     // Outputs full query to console for copy/paste into chainquery (debugging)
     console.log(query);
-    rp(`https://chainquery.lbry.io/api/sql?query=` + query)
+    rp(`https://chainquery.lbry.com/api/sql?query=` + query)
       .then(function (htmlString) {
         resolve(htmlString);
       })
