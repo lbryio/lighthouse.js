@@ -64,7 +64,8 @@ export async function claimSync () {
       for (let claim of claims) {
         if (claim.value === null) {
           console.log(claim);
-          await logErrorToSlack('Failed to process claim ' + claim.claimId + ' due to missing value');
+          // await logErrorToSlack('Failed to process claim ' + claim.claimId + ' due to missing value');
+          console.error('Failed to process claim ' + claim.claimId + ' due to missing value');
           continue;
         }
         claim.value = JSON.parse(claim.value).Claim;
