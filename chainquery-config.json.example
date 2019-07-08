@@ -1,0 +1,6 @@
+{
+  "host": "chainquery.lbry.com",
+  "user": "lighthouse",
+  "password": "",
+  "db": "chainquery"
+}

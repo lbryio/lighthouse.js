@@ -13,6 +13,7 @@ import fs from 'fs';
 import fileExists from 'file-exists';
 import * as util from './util';
 import {logErrorToSlack} from '../../index';
+import mysql from 'mysql';
 
 const elasticsearchloglevel = 'info';
 const MaxClaimsToProcessPerIteration = 100000;
@@ -31,7 +32,9 @@ const queue = new ElasticQueue({elastic: eclient});
 
 // Check that our syncState file exist.
 fileExists(path.join(appRoot.path, 'syncState.json'), (err, exists) => {
-  if (err) { throw err }
+  if (err) {
+    throw err;
+  }
   if (!exists) {
     fs.writeFileSync(path.join(appRoot.path, 'syncState.json'), '{}');
   }
@@ -153,6 +156,7 @@ function getJSON (path) {
     });
   });
 }
+
 function saveJSON (path, obj) {
   return new Promise((resolve, reject) => {
     jsonfile.writeFile(path, obj, function (err, jsoncontent) {
@@ -183,34 +187,30 @@ function getBlockedOutpoints () {
   });
 }
 
+let connection = null;
+const chainqueryConfig = require('../../../chainquery-config.json');
+
 function getClaimsSince (time, lastID, MaxClaimsInCall) {
+  if (connection === null) {
+    connection = mysql.createConnection({
+      host    : chainqueryConfig.host,
+      user    : chainqueryConfig.user,
+      password: chainqueryConfig.password,
+      database: chainqueryConfig.db,
+    });
+    connection.connect();
+  }
+
   return new Promise((resolve, reject) => {
-    let query =  `` +
-      `SELECT ` +
-      `c.id, ` +
-      `c.name,` +
-      `p.name as channel,` +
-      `p.claim_id as channel_id,` +
-      `c.bid_state,` +
-      `c.effective_amount,` +
-      `COALESCE(p.effective_amount,1) as certificate_amount,` +
-      `c.claim_id as claimId,` +
-      `c.value_as_json as value ` +
-      `FROM claim c ` +
-      `LEFT JOIN claim p on p.claim_id = c.publisher_id ` +
-      `WHERE c.id >` + lastID + ` ` +
-      `AND c.modified_at >='` + time + `' ` +
-      `ORDER BY c.id ` +
-      `LIMIT ` + MaxClaimsInCall;
+    let query = `SELECT c.id, c.name,p.name as channel, p.claim_id as channel_id, c.bid_state,c.effective_amount,COALESCE(p.effective_amount,1) as certificate_amount,c.claim_id as claimId,c.value_as_json as value FROM claim c LEFT JOIN claim p on p.claim_id = c.publisher_id WHERE c.id >${lastID} AND c.modified_at >='${time}' ORDER BY c.id LIMIT ${MaxClaimsInCall}`;
     // Outputs full query to console for copy/paste into chainquery (debugging)
     console.log(query);
-    rp(`https://chainquery.lbry.com/api/sql?query=` + query)
-      .then(function (htmlString) {
-        resolve(htmlString);
-      })
-      .catch(function (err) {
+    connection.query(query, function (err, results, fields) {
+      if (err) {
         logErrorToSlack('[Importer] Error getting updated claims. ' + err);
-        reject(err);
-      });
+        return reject(err);
+      }
+      resolve(results);
+    });
   });
 }
