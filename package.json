@@ -38,7 +38,7 @@
     "@koa/cors": "^2.2.1",
     "app-root-path": "^2.0.1",
     "babel-polyfill": "^6.5.0",
-    "bitcoin-promise": "filipnyquist/node-bitcoin-promise",
+    "bitcoin-promise": "nikooo777/node-bitcoin-promise",
     "bluebird": "^3.5.0",
     "chalk": "^2.0.1",
     "crypto": "^1.0.1",
