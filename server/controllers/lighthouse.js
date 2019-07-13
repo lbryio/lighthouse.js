@@ -38,8 +38,8 @@ function getResults (input) {
     input.from = 10000 - input.size;
   }
   let trimmedQuery = input.s.trim();
-  let escapedQuery = getWashedQuery(getEscapedQuery(trimmedQuery));
-  let washedQuery = getWashedQuery(trimmedQuery);
+  let escapedQuery = getEscapedQuery(trimmedQuery);
+  let washedQuery = getEscapedQuery(getWashedQuery(trimmedQuery));
   let effectiveFactor = '0.00000000001';
   // Search is split up into different parts, all search parts goes under this line.
   let channelSearch;
@@ -49,7 +49,7 @@ function getResults (input) {
         'must': {
           'query_string': {
             'fields': ['channel'],
-            'query' : getEscapedQuery(getWashedQuery(input.channel.trim())),
+            'query' : getEscapedQuery(input.channel.trim()),
           },
         },
       },
@@ -114,10 +114,11 @@ function getResults (input) {
     });
     return queries;
   };
+
   const matPhraseName = { // Match search text as phrase - Name
     'match_phrase': {
       'name': {
-        'query': washedQuery,
+        'query': escapedQuery,
         'boost': 10,
       },
     },
@@ -168,7 +169,7 @@ function getResults (input) {
             { // Match search text as phrase - Author
               'match_phrase': {
                 'value.stream.metadata.author': {
-                  'query': washedQuery,
+                  'query': escapedQuery,
                   'boost': 3,
                 },
               },
@@ -184,7 +185,7 @@ function getResults (input) {
             { // Match search text as phrase - Title
               'match_phrase': {
                 'value.stream.metadata.title': {
-                  'query': washedQuery,
+                  'query': escapedQuery,
                   'boost': 3,
                 },
               },
@@ -200,7 +201,7 @@ function getResults (input) {
             { // Match search text as phrase - Description
               'match_phrase': {
                 'value.stream.metadata.description': {
-                  'query': washedQuery,
+                  'query': escapedQuery,
                   'boost': 3,
                 },
               },
