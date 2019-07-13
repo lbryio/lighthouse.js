@@ -84,16 +84,46 @@ function getResults (input) {
 
   const splitName = () => {
     let queries = [];
+    let conCatTerm = '';
+    let phraseTerm = '';
     escapedQuery.split(' ').forEach((term) => {
-      queries.push({ // Contains search term
-        'query_string': {
-          'query' : `*${term}*`,
-          'fields': [
-            'name',
-          ],
-          'boost': 3,
+      phraseTerm = phraseTerm + ' ' + term;
+      conCatTerm = conCatTerm + term;
+      queries.push(
+        { // Contains an individual search term
+          'query_string': {
+            'query' : `*${term}*`,
+            'fields': [
+              'name',
+            ],
+            'boost': 1,
+          },
         },
-      });
+        { // Contains 1..n of the terms as a phrase
+          'query_string': {
+            'query' : `*${phraseTerm}*`,
+            'fields': [
+              'name',
+            ],
+            'boost': 1,
+          },
+        },
+        { // Contains  1..n of the terms together
+          'query_string': {
+            'query' : `*${conCatTerm}*`,
+            'fields': [
+              'name',
+            ],
+            'boost': 300,
+          },
+        },
+        {
+          'prefix': { 'name': { 'value': '@' + escapedQuery, 'boost': 10 } },
+        },
+        {
+          'prefix': { 'name': { 'value': escapedQuery, 'boost': 10 } },
+        },
+      );
     });
     return queries;
   };
@@ -126,7 +156,7 @@ function getResults (input) {
   const matTextName = { // Match search text - Name
     'match': {
       'name': {
-        'query': washedQuery,
+        'query': escapedQuery,
         'boost': 5,
       },
     },
@@ -475,7 +505,7 @@ class LighthouseControllers {
       let cResults = [];
       for (let pResult of results) {
         var name = pResult._source.name;
-        if (name.indexOf(ctx.query.s.trim()) > -1 && name.indexOf('http') === -1) {
+        if (name.toString().indexOf(ctx.query.s.trim()) > -1 && name.toString().indexOf('http') === -1) {
           cResults.push(name);
         }
         if (pResult._source.value &&
