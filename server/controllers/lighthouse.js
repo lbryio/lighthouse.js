@@ -86,7 +86,8 @@ function getResults (input) {
     let queries = [];
     let conCatTerm = '';
     let phraseTerm = '';
-    escapedQuery.split(' ').forEach((term) => {
+    escapedQuery.split(' ').every((term, index) => {
+      if (index === 4) { return false }
       phraseTerm = phraseTerm + ' ' + term;
       conCatTerm = conCatTerm + term;
       queries.push(
@@ -129,7 +130,8 @@ function getResults (input) {
   };
   const splitATD = () => {
     let queries = [];
-    escapedQuery.split(' ').forEach((term) => {
+    escapedQuery.split(' ').every((term, index) => {
+      if (index === 4) { return false }
       queries.push({ // Contains search term in Author, Title, Description
         'query_string': {
           'query' : `*${term}*`,
