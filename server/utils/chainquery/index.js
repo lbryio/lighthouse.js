@@ -105,7 +105,7 @@ async function deleteBlockedClaims () {
 }
 
 async function deleteFromElastic (claimid) {
-  return new Promise(async(resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     queue.push({
       index: 'claims',
       type : 'claim',
@@ -116,7 +116,7 @@ async function deleteFromElastic (claimid) {
 }
 
 async function pushElastic (claim) {
-  return new Promise(async(resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     queue.push({
       index: 'claims',
       type : 'claim',

@@ -197,7 +197,7 @@ export function getValue (tx, i) {
 }
 
 async function pushElastic (claim) {
-  return new Promise(async(resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     queue.push({
       index: 'claims',
       type : 'claim',
