@@ -175,6 +175,7 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
       `c.id, ` +
       `c.name,` +
       `p.name as channel,` +
+      `p.claim_id as channel_id,` +
       `c.bid_state,` +
       `c.effective_amount,` +
       `COALESCE(p.effective_amount,1) as certificate_amount,` +
