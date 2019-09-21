@@ -48,6 +48,9 @@ export async function claimSync () {
     if (!syncState.LastID) {
       syncState.LastID = 0;
     }
+    if (!syncState.StartSyncTime || syncState.LastID === 0) {
+      syncState.StartSyncTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    }
     status.info = 'gettingClaimsToUpdate';
     let finished = false;
     let lastID = syncState.LastID;
@@ -85,7 +88,8 @@ export async function claimSync () {
     if (iteration * BatchSize + BatchSize >= MaxClaimsToProcessPerIteration) {
       syncState.LastID = lastID;
     } else {
-      syncState.LastSyncTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      syncState.LastID = 0;
+      syncState.LastSyncTime = syncState.StartSyncTime;
     }
     await saveJSON(path.join(appRoot.path, 'syncState.json'), syncState);
     status.info = 'upToDate';
