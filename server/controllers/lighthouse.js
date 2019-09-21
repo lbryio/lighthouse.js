@@ -4,8 +4,7 @@ import winstonStream from 'winston-stream';
 import elasticsearch from 'elasticsearch';
 import rp from 'request-promise';
 import pretty from 'prettysize';
-import {claimSync} from '../utils/chainquery';
-import {getStats} from '../utils/importer';
+import {claimSync, getStats} from '../utils/chainquery';
 import crypto from 'crypto';
 import got from 'got';
 import {logToSlack} from '../index';
@@ -420,7 +419,7 @@ function getStatus () {
     rp(`http://localhost:9200/claims/_stats`)
       .then(function (data) {
         data = JSON.parse(data);
-        resolve({status: getStats().info, spaceUsed: pretty(data._all.total.store.size_in_bytes, true), claimsInIndex: data._all.total.indexing.index_total, totSearches: data._all.total.search.query_total});
+        resolve({status: getStats(), spaceUsed: pretty(data._all.total.store.size_in_bytes, true), claimsInIndex: data._all.total.indexing.index_total, totSearches: data._all.total.search.query_total});
       })
       .catch(function (err) {
         reject(err);

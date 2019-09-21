@@ -11,7 +11,7 @@ import rp from 'request-promise';
 import appRoot from 'app-root-path';
 import fs from 'fs';
 import fileExists from 'file-exists';
-import * as util from '../../utils/importer/util';
+import * as util from './util';
 import {logErrorToSlack} from '../../index';
 
 const elasticsearchloglevel = 'info';
@@ -37,7 +37,7 @@ fileExists(path.join(appRoot.path, 'syncState.json'), (err, exists) => {
   }
 });
 
-let status = {};
+let status = {info: 'startup successful'};
 
 export async function claimSync () {
   try {
@@ -93,6 +93,7 @@ export async function claimSync () {
     }
     await saveJSON(path.join(appRoot.path, 'syncState.json'), syncState);
     status.info = 'upToDate';
+    status.syncState = syncState;
     await sleep(600000);
     claimSync();
   } catch (err) {
