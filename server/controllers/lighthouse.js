@@ -98,6 +98,14 @@ function getResults (input) {
       },
     },
   };
+  // Try prefix query without an @ if it exists
+  const channelIdentifier = {
+    'prefix': {
+      'name': {
+        'value': escapedQuery.replace(/^@/gi, ''), 'boost': 50,
+      },
+    },
+  };
 
   const splitName = () => {
     let queries = [];
@@ -271,6 +279,7 @@ function getResults (input) {
             conBoost,
             funcScoreClaimWeight,
             funcScoreChannelWeight,
+            channelIdentifier,
           ],
           'must': [
             ...dynamicFilters(),
