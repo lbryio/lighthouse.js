@@ -269,7 +269,7 @@ function getResults (input) {
           ],
           'must': [
             channelSearch,
-            channelidSearch,
+            // channelidSearch, // Commented for now to prevent query error while I investigate.
             {
               'bool': {
                 'should': [
