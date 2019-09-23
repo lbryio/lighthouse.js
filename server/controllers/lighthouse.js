@@ -40,33 +40,38 @@ function getResults (input) {
   let escapedQuery = getEscapedQuery(trimmedQuery);
   let washedQuery = getEscapedQuery(getWashedQuery(trimmedQuery));
   let effectiveFactor = '0.00000000001';
-  // Search is split up into different parts, all search parts goes under this line.
-  let channelidSearch;
-  if (input.channel_id !== undefined) {
-    channelidSearch = { // If we got a channel_id argument, lets filter out only that channel_id
-      'bool': {
-        'must': {
-          'query_string': {
-            'fields': ['channel_id'],
-            'query' : getEscapedQuery(input.channel_id.trim()),
+  const dynamicFilters = () => {
+    let queries = [];
+    // Search is split up into different parts, all search parts goes under this line.
+    if (input.channel_id !== undefined) {
+      const channelidSearch = { // If we got a channel_id argument, lets filter out only that channel_id
+        'bool': {
+          'must': {
+            'query_string': {
+              'fields': ['channel_id'],
+              'query' : getEscapedQuery(input.channel_id.trim()),
+            },
           },
         },
-      },
-    };
-  }
-  let channelSearch;
-  if (input.channel !== undefined) { // If we got a channel argument, lets filter out only that channel
-    channelSearch = {
-      'bool': {
-        'must': {
-          'query_string': {
-            'fields': ['channel'],
-            'query' : getEscapedQuery(input.channel.trim()),
+      };
+      queries.push(channelidSearch);
+    }
+    if (input.channel !== undefined) { // If we got a channel argument, lets filter out only that channel
+      const channelSearch = {
+        'bool': {
+          'must': {
+            'query_string': {
+              'fields': ['channel'],
+              'query' : getEscapedQuery(input.channel.trim()),
+            },
           },
         },
-      },
-    };
-  }
+      };
+      queries.push(channelSearch);
+    }
+    return queries;
+  };
+
   const conBoost = { // Controlling claims should get higher placement in search results.
     'match': {
       'bid_state': {
@@ -268,8 +273,7 @@ function getResults (input) {
             funcScoreChannelWeight,
           ],
           'must': [
-            channelSearch,
-            // channelidSearch, // Commented for now to prevent query error while I investigate.
+            ...dynamicFilters(),
             {
               'bool': {
                 'should': [
@@ -292,7 +296,7 @@ function getResults (input) {
       },
     },
   };
-  // console.log('QUERY: ', esQuery);
+  // console.log('QUERY: ', JSON.stringify(esQuery));
   return eclient.search(esQuery);
 }
 
