@@ -76,9 +76,9 @@ export async function claimSync () {
           };
         }
         if (claim.bid_state === 'Spent' || claim.bid_state === 'Expired') {
-          deleteFromElastic(claim.claimId);
+          await deleteFromElastic(claim.claimId);
         } else {
-          pushElastic(claim);
+          await pushElastic(claim);
         }
         lastID = claim.id;
       }
@@ -86,7 +86,7 @@ export async function claimSync () {
       finished = claims.length < BatchSize || (iteration * BatchSize + BatchSize >= MaxClaimsToProcessPerIteration);
       iteration++;
     }
-    deleteBlockedClaims();
+    await deleteBlockedClaims();
     // If not finished, store last id to run again later where we left off, otherwise update last sync time.
     if (iteration * BatchSize + BatchSize >= MaxClaimsToProcessPerIteration) {
       syncState.LastID = lastID;
@@ -98,12 +98,12 @@ export async function claimSync () {
     status.info = 'upToDate';
     status.syncState = syncState;
     await sleep(600000);
-    claimSync();
+    await claimSync();
   } catch (err) {
     await logErrorToSlack(err);
     status.err = err;
     await sleep(600000);
-    claimSync();
+    await claimSync();
   }
 }
 
