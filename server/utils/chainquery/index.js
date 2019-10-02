@@ -28,7 +28,11 @@ const eclient = new elasticsearch.Client({
     stream: loggerStream,
   },
 });
+
 const queue = new ElasticQueue({elastic: eclient});
+queue.on('drain', function () {
+  console.log('elasticsearch queue is drained');
+});
 
 // Check that our syncState file exist.
 fileExists(path.join(appRoot.path, 'syncState.json'), (err, exists) => {
