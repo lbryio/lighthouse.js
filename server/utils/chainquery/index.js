@@ -80,9 +80,9 @@ export async function claimSync () {
           };
         }
         if (claim.bid_state === 'Spent' || claim.bid_state === 'Expired') {
-          await deleteFromElastic(claim.claimId);
+          deleteFromElastic(claim.claimId);
         } else {
-          await pushElastic(claim);
+          pushElastic(claim);
         }
         lastID = claim.id;
       }
@@ -126,25 +126,21 @@ async function deleteBlockedClaims () {
   winston.log('info', '[Importer] Done processing blocked claims!');
 }
 
-async function deleteFromElastic (claimid) {
-  return new Promise(async (resolve, reject) => {
-    queue.push({
-      index: 'claims',
-      type : 'claim',
-      id   : claimid,
-      body : {},
-    });
+function deleteFromElastic (claimid) {
+  queue.push({
+    index: 'claims',
+    type : 'claim',
+    id   : claimid,
+    body : {},
   });
 }
 
-async function pushElastic (claim) {
-  return new Promise(async (resolve, reject) => {
-    queue.push({
-      index: 'claims',
-      type : 'claim',
-      id   : claim.claimId,
-      body : claim,
-    });
+function pushElastic (claim) {
+  queue.push({
+    index: 'claims',
+    type : 'claim',
+    id   : claim.claimId,
+    body : claim,
   });
 }
 
