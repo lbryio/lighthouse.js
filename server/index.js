@@ -6,14 +6,14 @@ import helmet from 'koa-helmet';
 import routing from './routes/';
 import { port } from './config';
 import winston from 'winston';
-import slack from 'node-slack';
+import Slack from 'node-slack';
 require('winston-daily-rotate-file');
 
 // Setup logging
 winston.remove(winston.transports.Console);
 winston.add(winston.transports.Console, { colorize: true, timestamp: true, prettyPrint: true });
-let slackAPIKey = process.env.SLACK_HOOK_URL;
-let mySlack = new slack(slackAPIKey, {});
+const slackAPIKey = process.env.SLACK_HOOK_URL;
+const mySlack = new Slack(slackAPIKey, {});
 // Create Koa Application
 const app = new Koa();
 

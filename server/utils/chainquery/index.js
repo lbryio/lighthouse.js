@@ -14,16 +14,19 @@ import fileExists from 'file-exists';
 import * as util from './util';
 import {logErrorToSlack} from '../../index';
 import mysql from 'mysql';
+import chainqueryConfig from '../../../chainquery-config.json';
 
-const elasticsearchloglevel = 'info';
+let connection = null;
+
+const esLogLevel = 'info';
 const MaxClaimsToProcessPerIteration = 100000;
 const BatchSize = 5000;
-const loggerStream = winstonStream(winston, elasticsearchloglevel);
+const loggerStream = winstonStream(winston, esLogLevel);
 const eclient = new elasticsearch.Client({
   host: 'http://localhost:9200',
 
   log: {
-    level : elasticsearchloglevel,
+    level : esLogLevel,
     type  : 'stream',
     stream: loggerStream,
   },
@@ -187,10 +190,7 @@ function getBlockedOutpoints () {
   });
 }
 
-let connection = null;
-const chainqueryConfig = require('../../../chainquery-config.json');
-
-function getClaimsSince (time, lastID, MaxClaimsInCall) {
+function getChainqueryConnection () {
   if (connection === null) {
     connection = mysql.createConnection({
       host    : chainqueryConfig.host,
@@ -200,12 +200,15 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
     });
     connection.connect();
   }
+  return connection;
+}
 
+function getClaimsSince (time, lastID, MaxClaimsInCall) {
   return new Promise((resolve, reject) => {
     let query = `SELECT c.id, c.name,p.name as channel, p.claim_id as channel_id, c.bid_state,c.effective_amount,COALESCE(p.effective_amount,1) as certificate_amount,c.claim_id as claimId,c.value_as_json as value FROM claim c LEFT JOIN claim p on p.claim_id = c.publisher_id WHERE c.id >${lastID} AND c.modified_at >='${time}' ORDER BY c.id LIMIT ${MaxClaimsInCall}`;
     // Outputs full query to console for copy/paste into chainquery (debugging)
     console.log(query);
-    connection.query(query, function (err, results, fields) {
+    getChainqueryConnection().query(query, function (err, results, fields) {
       if (err) {
         console.error(err);
         logErrorToSlack('[Importer] Error getting updated claims. ' + err);
