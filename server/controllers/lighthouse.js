@@ -93,7 +93,7 @@ function getResults (input) {
     'function_score': {
       'field_value_factor': {
         'field'  : 'certificate_amount',
-        'factor' : effectiveFactor,
+        'factor' : effectiveFactor / 10,
         'missing': 1,
       },
     },
