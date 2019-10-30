@@ -75,7 +75,7 @@ export async function claimSync () {
           console.error('Failed to process claim ' + claim.claimId + ' due to missing value');
           continue;
         }
-        claim.value = JSON.parse(claim.value).Claim;
+        claim.value = claim.value.Claim;
         if (claim.name && claim.value) {
           claim.suggest_name = {
             input : '' + claim.name + '',
@@ -217,6 +217,13 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
       let claims = [];
       for (let i = 0; i < results.length; i++) {
         let r = results[i];
+        let value = null;
+        try {
+          value = JSON.parse(r.value);
+        } catch (e) {
+          console.error(e);
+          console.error(r.value);
+        }
         claims.push({
           id                : r.id,
           name              : r.name,
@@ -225,7 +232,7 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
           effective_amount  : r.effective_amount,
           certificate_amount: r.certificate_amount,
           claimId           : r.claimId,
-          value             : r.value,
+          value             : value,
         });
       }
       resolve(claims);
