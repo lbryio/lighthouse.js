@@ -8,7 +8,7 @@ The official lighthouse instance is live at https://lighthouse.lbry.com
 
 ### What does Lighthouse consist of?
 
-1. Elasticsearch as a backend db server.
+1. Elasticsearch as a backend database server.
 2. LBRYimport, an importer that imports the claims into the Elasticsearch database.
 3. Lighthouse API server, which serves the API and does all calculations about what to send to the end user. 
 ### API Documentation / Usage example
@@ -45,7 +45,7 @@ npm run install --production=false
 ```
 npm run prod
 ```
->You are now up and running! You can connect to lighthouse at http://localhost:50005, api documentation is [here](https://lbryio.github.io/lighthouse/).
+>You are now up and running! You can connect to lighthouse at http://localhost:50005, API documentation is [here](https://lbryio.github.io/lighthouse/).
 Lighthouse will continue syncing in the background. It usually takes ~15 minutes before all claims are up to date in the database.
 
 ## Contributing
