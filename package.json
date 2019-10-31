@@ -56,6 +56,7 @@
     "koa-logger": "^2.0.0",
     "koa-router": "^7.0.0",
     "limited-request-queue": "^3.0.4",
+    "mysql": "^2.17.1",
     "node-slack": "^0.0.7",
     "oas": "^0.8.15",
     "ora": "^1.3.0",

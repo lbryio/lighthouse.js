@@ -48,7 +48,7 @@ function getResults (input) {
         'bool': {
           'must': {
             'query_string': {
-              'fields': ['channel_id'],
+              'fields': ['channel_claim_id'],
               'query' : getEscapedQuery(input.channel_id.trim()),
             },
           },
