@@ -205,7 +205,20 @@ function getChainqueryConnection () {
 
 function getClaimsSince (time, lastID, MaxClaimsInCall) {
   return new Promise((resolve, reject) => {
-    let query = `SELECT c.id, c.name,p.name as channel, p.claim_id as channel_id, c.bid_state,c.effective_amount,COALESCE(p.effective_amount,1) as certificate_amount,c.claim_id as claimId,c.value_as_json as value FROM claim c LEFT JOIN claim p on p.claim_id = c.publisher_id WHERE c.id >${lastID} AND c.modified_at >='${time}' ORDER BY c.id LIMIT ${MaxClaimsInCall}`;
+    let query = `SELECT c.id,
+     c.name,
+     p.name as channel,
+     p.claim_id as channel_id,
+     c.bid_state,
+     c.effective_amount,
+     COALESCE(p.effective_amount,1) as certificate_amount,
+     c.claim_id as claimId,
+     c.value_as_json as value
+     FROM claim c LEFT JOIN claim p
+     on p.claim_id = c.publisher_id
+     WHERE c.id >${lastID} AND
+     c.modified_at >='${time}'
+     ORDER BY c.id LIMIT ${MaxClaimsInCall}`;
     // Outputs full query to console for copy/paste into chainquery (debugging)
     console.log(query);
     getChainqueryConnection().query(query, function (err, results, fields) {
@@ -228,6 +241,7 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
           id                : r.id,
           name              : r.name,
           channel           : r.channel,
+          channel_claim_id  : r.channel_id,
           bid_state         : r.bid_state,
           effective_amount  : r.effective_amount,
           certificate_amount: r.certificate_amount,
