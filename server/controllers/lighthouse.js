@@ -80,32 +80,42 @@ function getResults (input) {
       },
     },
   };
-  const newerBoost = [ // New claims should come up further up
-    {
-      'range': {
-        'transaction_time': {
-          'boost': 5,
-          'gte'  : new Date().setDate(Date.now() - 30),
+  const newerBoost = {
+    'function_score': {
+      'score_mode': 'sum', // All functions outputs get summed
+      'boost_mode': 'multiply', // The documents relevance is multiplied with the sum
+
+      'functions': [
+        {
+          // The relevancy of old posts is multiplied by at least one.
+          // Remove if you want to exclude old posts
+          'weight': 1,
         },
-      },
-    },
-    {
-      'range': {
-        'transaction_time': {
-          'boost': 4,
-          'gte'  : new Date().setDate(Date.now() - 60),
+        {
+          // Published this month get a big boost
+          'weight': 50,
+          'gauss' : {
+            'transaction_time': { // <- Change to your date field name
+              'origin': Date.now(), // Change to current date
+              'scale' : '31d',
+              'decay' : 0.5,
+            },
+          },
         },
-      },
-    },
-    {
-      'range': {
-        'transaction_time': {
-          'boost': 3,
-          'gte'  : new Date().setDate(Date.now() - 90),
+        {
+          // Published this year get a boost
+          'weight': 20,
+          'gauss' : {
+            'transaction_time': { // <- Change to your date field name
+              'origin': Date.now(), // Change to current date
+              'scale' : '356d',
+              'decay' : 0.5,
+            },
+          },
         },
-      },
+      ],
     },
-  ];
+  };
   const funcScoreClaimWeight = { // 100 LBC adds 1 point to the score
     'function_score': {
       'field_value_factor': {
