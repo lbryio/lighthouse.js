@@ -89,16 +89,27 @@ function getResults (input) {
         {
           // The relevancy of old posts is multiplied by at least one.
           // Remove if you want to exclude old posts
-          'weight': 1,
+          'weight': 0.6,
         },
         {
           // Published this week get a big boost
-          'weight': 80,
+          'weight': 85,
           'gauss' : {
             'transaction_time': { // <- Change to your date field name
               'origin': Date.now(), // Change to current date
               'scale' : '7d',
-              'decay' : 0.5,
+              'decay' : 0.6,
+            },
+          },
+        },
+        {
+          // Published this month get a big boost
+          'weight': 60,
+          'gauss' : {
+            'transaction_time': { // <- Change to your date field name
+              'origin': Date.now(), // Change to current date
+              'scale' : '31d',
+              'decay' : 0.55,
             },
           },
         },
@@ -108,19 +119,19 @@ function getResults (input) {
           'gauss' : {
             'transaction_time': { // <- Change to your date field name
               'origin': Date.now(), // Change to current date
-              'scale' : '31d',
+              'scale' : '62d',
               'decay' : 0.5,
             },
           },
         },
         {
           // Published this year get a boost
-          'weight': 20,
+          'weight': 40,
           'gauss' : {
             'transaction_time': { // <- Change to your date field name
               'origin': Date.now(), // Change to current date
               'scale' : '356d',
-              'decay' : 0.5,
+              'decay' : 0.2,
             },
           },
         },
@@ -576,6 +587,7 @@ class LighthouseControllers {
   async search (ctx) {
     await getResults(ctx.query).then(function (result) {
       let results = result.hits.hits;
+      console.log(results);
       let cResults = [];
       for (let pResult of results) {
         cResults.push(pResult._source);
