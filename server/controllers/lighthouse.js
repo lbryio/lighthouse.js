@@ -92,6 +92,17 @@ function getResults (input) {
           'weight': 1,
         },
         {
+          // Published this week get a big boost
+          'weight': 80,
+          'gauss' : {
+            'transaction_time': { // <- Change to your date field name
+              'origin': Date.now(), // Change to current date
+              'scale' : '7d',
+              'decay' : 0.5,
+            },
+          },
+        },
+        {
           // Published this month get a big boost
           'weight': 50,
           'gauss' : {
