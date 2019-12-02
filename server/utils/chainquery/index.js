@@ -19,7 +19,7 @@ import chainqueryConfig from '../../../chainquery-config.json';
 let connection = null;
 
 const esLogLevel = 'info';
-const MaxClaimsToProcessPerIteration = 100000;
+const MaxClaimsToProcessPerIteration = 100000000;
 const BatchSize = 5000;
 const loggerStream = winstonStream(winston, esLogLevel);
 const eclient = new elasticsearch.Client({
@@ -32,7 +32,7 @@ const eclient = new elasticsearch.Client({
   },
 });
 
-const queue = new ElasticQueue({elastic: eclient});
+const queue = new ElasticQueue({batchSize: 5000, concurrency: 6, elastic: eclient});
 queue.on('drain', function () {
   console.log('elasticsearch queue is drained');
 });
@@ -211,6 +211,7 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
      p.claim_id as channel_id,
      c.bid_state,
      c.effective_amount,
+     c.transaction_time,
      COALESCE(p.effective_amount,1) as certificate_amount,
      c.claim_id as claimId,
      c.value_as_json as value
@@ -245,6 +246,7 @@ function getClaimsSince (time, lastID, MaxClaimsInCall) {
           bid_state         : r.bid_state,
           effective_amount  : r.effective_amount,
           certificate_amount: r.certificate_amount,
+          transaction_time  : new Date(r.transaction_time * 1000),
           claimId           : r.claimId,
           value             : value,
         });

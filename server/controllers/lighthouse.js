@@ -80,6 +80,32 @@ function getResults (input) {
       },
     },
   };
+  const newerBoost = [ // New claims should come up further up
+    {
+      'range': {
+        'transaction_time': {
+          'boost': 5,
+          'gte'  : new Date().setDate(Date.now() - 30),
+        },
+      },
+    },
+    {
+      'range': {
+        'transaction_time': {
+          'boost': 4,
+          'gte'  : new Date().setDate(Date.now() - 60),
+        },
+      },
+    },
+    {
+      'range': {
+        'transaction_time': {
+          'boost': 3,
+          'gte'  : new Date().setDate(Date.now() - 90),
+        },
+      },
+    },
+  ];
   const funcScoreClaimWeight = { // 100 LBC adds 1 point to the score
     'function_score': {
       'field_value_factor': {
@@ -112,7 +138,9 @@ function getResults (input) {
     let conCatTerm = '';
     let phraseTerm = '';
     escapedQuery.split(' ').every((term, index) => {
-      if (index === 4) { return false }
+      if (index === 4) {
+        return false;
+      }
       phraseTerm = phraseTerm + ' ' + term;
       conCatTerm = conCatTerm + term;
       queries.push(
@@ -144,10 +172,10 @@ function getResults (input) {
           },
         },
         {
-          'prefix': { 'name': { 'value': '@' + escapedQuery, 'boost': 10 } },
+          'prefix': {'name': {'value': '@' + escapedQuery, 'boost': 10}},
         },
         {
-          'prefix': { 'name': { 'value': escapedQuery, 'boost': 10 } },
+          'prefix': {'name': {'value': escapedQuery, 'boost': 10}},
         },
       );
     });
@@ -156,7 +184,9 @@ function getResults (input) {
   const splitATD = () => {
     let queries = [];
     escapedQuery.split(' ').every((term, index) => {
-      if (index === 4) { return false }
+      if (index === 4) {
+        return false;
+      }
       queries.push({ // Contains search term in Author, Title, Description
         'query_string': {
           'query' : `*${term}*`,
@@ -277,6 +307,7 @@ function getResults (input) {
         'bool': {
           'should': [
             conBoost,
+            newerBoost,
             funcScoreClaimWeight,
             funcScoreChannelWeight,
             channelIdentifier,
@@ -360,7 +391,7 @@ function getAutoCompleteQuery (query) {
 
 function getFilters (input) {
   var filters = [];
-  var bidStateFilter = {'bool': {'must_not': {'match': { 'bid_state': 'Accepted' }}}};
+  var bidStateFilter = {'bool': {'must_not': {'match': {'bid_state': 'Accepted'}}}};
   if (input.nsfw === 'true' || input.nsfw === 'false') {
     const nsfwFilter = {'match': {'value.stream.metadata.nsfw': input.nsfw}};
     filters.push(nsfwFilter);
@@ -416,7 +447,7 @@ function getFilters (input) {
       },
       bidStateFilter];
     return filterQuery;
-  }  else {
+  } else {
     return [bidStateFilter];
   }
 }
@@ -446,7 +477,12 @@ function getStatus () {
     rp(`http://localhost:9200/claims/_stats`)
       .then(function (data) {
         data = JSON.parse(data);
-        resolve({status: getStats(), spaceUsed: pretty(data._all.total.store.size_in_bytes, true), claimsInIndex: data._all.total.indexing.index_total, totSearches: data._all.total.search.query_total});
+        resolve({
+          status       : getStats(),
+          spaceUsed    : pretty(data._all.total.store.size_in_bytes, true),
+          claimsInIndex: data._all.total.indexing.index_total,
+          totSearches  : data._all.total.search.query_total,
+        });
       })
       .catch(function (err) {
         reject(err);
@@ -459,11 +495,13 @@ function getWashedQuery (query) {
   query = query.toLowerCase().replace(/ +/g, ' ').replace('lbry://', '');
   let splitBy = ['&', '$', ' '];
   let regex = new RegExp(splitBy.join('|'), 'gi');
-  let badWords  = [ 'from', 'with', 'not', 'can', 'all', 'are', 'for', 'but', 'and', 'the' ];
+  let badWords = ['from', 'with', 'not', 'can', 'all', 'are', 'for', 'but', 'and', 'the'];
   let words = query.split(regex);
   let sentence = [];
   words.forEach(w => {
-    if (!badWords.includes(w))      { sentence.push(w) }
+    if (!badWords.includes(w)) {
+      sentence.push(w);
+    }
   });
   query = sentence.join(' ');
 
@@ -474,7 +512,7 @@ function getWashedQuery (query) {
 function getEscapedQuery (query) {
   // https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_reserved_characters
   // The reserved characters are: + - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /
-  let badCharacters  = ['+', '-', '=', '&&', '||', '>', '<', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '\\', '/'];
+  let badCharacters = ['+', '-', '=', '&&', '||', '>', '<', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '\\', '/'];
   let escapedQuery = '';
   for (var i = 0; i < query.length; i++) {
     let char1 = query.charAt(i);
@@ -502,12 +540,14 @@ async function update () {
 
 class LighthouseControllers {
   /* eslint-disable no-param-reassign */
+
   // Start syncing blocks...
   startSync () {
     winston.log('info', '[Importer] Started importer, indexing claims.');
     claimSync();
     // sync(); // Old Sync
   }
+
   /**
    * Search API Endpoint.
    * @param {ctx} Koa Context
@@ -537,8 +577,8 @@ class LighthouseControllers {
           cResults.push(name);
         }
         if (pResult._source.value &&
-            pResult._source.value.stream &&
-            pResult._source.value.stream !== undefined) {
+          pResult._source.value.stream &&
+          pResult._source.value.stream !== undefined) {
           var title = pResult._source.value.stream.metadata.title;
           var author = pResult._source.value.stream.metadata.author;
           if (title.indexOf(ctx.query.s.trim()) > -1 && title.indexOf('http') === -1) {
@@ -560,6 +600,7 @@ class LighthouseControllers {
       ctx.body = clean;
     });
   }
+
   /**
    * Info about the api here
    * @param {ctx} Koa Context
@@ -583,7 +624,7 @@ class LighthouseControllers {
   async autoUpdate (ctx) {
     let travisSignature = Buffer.from(ctx.request.headers.signature, 'base64');
     let payload = ctx.request.body.payload;
-    let travisResponse  = await got('https://api.travis-ci.com/config', {timeout: 10000});
+    let travisResponse = await got('https://api.travis-ci.com/config', {timeout: 10000});
     let travisPublicKey = JSON.parse(travisResponse.body).config.notifications.webhook.public_key;
     let verifier = crypto.createVerify('sha1');
     verifier.update(payload);
@@ -597,15 +638,18 @@ class LighthouseControllers {
           ctx.body = 'OK';
         } else {
           ctx.status = 400;
-          ctx.body = 'skip auto update: pull request'; logToSlack(ctx.body);
+          ctx.body = 'skip auto update: pull request';
+          logToSlack(ctx.body);
         }
       } else {
         ctx.status = 400;
-        ctx.body = 'skip auto update: only deploys on master branch'; logToSlack(ctx.body);
+        ctx.body = 'skip auto update: only deploys on master branch';
+        logToSlack(ctx.body);
       }
     } else {
       ctx.status = 500;
-      ctx.body = 'skip auto update: could not verify webhook'; logToSlack(ctx.body);
+      ctx.body = 'skip auto update: could not verify webhook';
+      logToSlack(ctx.body);
     }
   }
 
